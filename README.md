@@ -29,10 +29,11 @@ Loop - prioritize driving forward (north in terms of the robot's chassis)
 
 ## Why?
 
-For a (Destination Imagination Challenge)[https://www.destinationimagination.org] :). It also incorporates sound science and mathematics for the execution of movement functions.
+For a [Destination Imagination Challenge](https://www.destinationimagination.org) :). It also incorporates sound science and mathematics for the execution of movement functions.
 
 ### Faq
 
 #### Are you aware your code is rudimentary?
 
 > Yes, I barely have an idea of how to use a keyboard.
+> Jokes aside, I am still a beginner in C++, and I am scared of classes.
