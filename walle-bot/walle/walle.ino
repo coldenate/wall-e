@@ -3,9 +3,9 @@
 
 #include "NewPing.h"
 
-#define triggerPin 10
-#define echoPin 13
-#define MAX_DISTANCE 400
+#define triggerPin 10 //yellow
+#define echoPin 13 // orange
+#define MAX_DISTANCE 400 
 
 NewPing sonar(triggerPin, echoPin, MAX_DISTANCE);
 
