@@ -4,11 +4,19 @@
 #include "DHT.h"
 #include "NewPing.h"
 
-#define triggerPin 10 //yellow
-#define echoPin 13 // orange
+
+#define DHTPIN_W 5
+#define trigPin_W 6
+#define echoPin_W 7
+#define DHTPIN_E 8
+#define trigPin_E 9
+#define echoPin_E 10
+#define DHTPIN 11
+#define triggerPin 12 
+#define echoPin 13 
 #define MAX_DISTANCE 400 
 
-#define DHTPIN 7
+
 #define DHTYPE DHT11
 
 
