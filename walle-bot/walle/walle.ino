@@ -11,6 +11,8 @@ NewPing sonar(triggerPin, echoPin, MAX_DISTANCE);
 
 float duration, distance, sos;
 
+int iterations = 6;
+
 void setup()
 {
     // put your setup code here, to run once:
@@ -19,7 +21,7 @@ void setup()
 
 void loop()
 {
-    duration = sonar.ping();
+    duration = sonar.ping_median(iterations);
 
     distance = (duration/2)*0.0343;
     
