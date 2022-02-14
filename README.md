@@ -37,3 +37,6 @@ For a [Destination Imagination Challenge](https://www.destinationimagination.org
 
 > Yes, I barely have an idea of how to use a keyboard.
 > Jokes aside, I am still a beginner in C++, and I am scared of classes.
+
+# Legal Jargon
+`Copyright (c) 2022 Nate Solis`
