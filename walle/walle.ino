@@ -5,7 +5,7 @@
 #include "NewPing.h"
 
 
-#define DHTPIN 2
+#define DHTPIN 1
 // West
 #define trigPin_W 8
 #define echoPin_W 9
