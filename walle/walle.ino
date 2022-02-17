@@ -43,6 +43,10 @@ float soundspeedcm;
 
 int iterations = 6;
 bool debug_mode = false;
+bool stdf = true; //until proven otherwise
+bool Nsafe;
+bool Esafe; 
+bool Wsafe;
 
 DHT dht(DHTPIN, DHTYPE);
 
@@ -87,48 +91,74 @@ void loop() {
   distanceW = (durationW / 2) * soundspeedcm;
   if (debug_mode == true) {
 
-    Serial.println("Sound :");
-    Serial.print(soundspeedms);
-    Serial.print(" m/s, ");
-    Serial.print("Humidity:");
-    Serial.print(hum);
-    Serial.print("%, Temp:");
-    Serial.print(temp);
-    Serial.println(" C | Distances: ");
+    // Serial.println("Sound :");
+    // Serial.print(soundspeedms);
+    // Serial.print(" m/s, ");
+    // Serial.print("Humidity:");
+    // Serial.print(hum);
+    // Serial.print("%, Temp:");
+    // Serial.print(temp);
+    // Serial.println(" C | Distances: ");
   }
 
 
   Serial.println();
   Serial.print("\t\t\t\t\t\t\t\t");
   // tht was a bunch f tbats????
-  Serial.print("N:");
-  if (distance >= 400 || distance <= 2) {
-    Serial.print("Out of range | ");
+  if (distance >= 400 || distance <= 5) {
+    Nsafe = false;
+    if (debug_mode == true) {
+    Serial.print("Out of range | ");}
   }
 
   else {
-
+    Nsafe=true;
+    if (debug_mode == true) {
     Serial.print(distance);
-    Serial.print(" cm | ");
+    Serial.print(" cm | ");}
   }
-  Serial.print("E:");
-  if (distanceE >= 400 || distanceE <= 2) {
+
+  if (distanceE >= 400 || distanceE <= 5) {
+    Esafe = false;
+    if (debug_mode == true) {
     Serial.print("Out of range | ");
-  }
+  }}
 
   else {
-
+    Esafe=true;
+    if (debug_mode == true) {
     Serial.print(distanceE);
-    Serial.print(" cm | ");
+    Serial.print(" cm | ");}
   }
-  Serial.print("W:");
-  if (distanceW >= 400 || distanceW <= 2) {
+  if (distanceW >= 400 || distanceW <=5) {
+    Wsafe=false;
+    if (debug_mode == true) {
     Serial.println("Out of range | ");
-  }
+  }}
 
   else {
-
+    Wsafe=true;
+    if (debug_mode == true) {
     Serial.print(distanceW);
-    Serial.print(" cm | ");
+    Serial.print(" cm | ");}
   }
+  if (Nsafe == true) {
+    stdf=true;
+    Serial.println("I am driving forward");
+  }
+  if (Nsafe==false) {
+    Serial.println("Wait crap there is dead end man cmon. Traffic jammmm");
+    stdf=false;
+    // at this point, the decision tree will decide if we should turn left or right
+    if (Wsafe == true) {
+      // turn left
+      Serial.print("Turn leftt");
+    }
+    if (Esafe == true) {
+      // turn right
+      Serial.print("Turn right");
+    }
+  }
+
+  
 }
