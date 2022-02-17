@@ -5,7 +5,7 @@
 #include "NewPing.h"
 
 
-#define DHTPIN 1
+#define DHTPIN 3
 // West
 #define trigPin_W 8
 #define echoPin_W 9
@@ -50,7 +50,7 @@ void setup() {
 void loop() {
 
 
-  delay(1000);
+
 
   hum = dht.readHumidity();
   temp = dht.readTemperature();
@@ -69,50 +69,47 @@ void loop() {
   distanceE = (durationE / 2) * soundspeedcm;
   distanceW = (durationW / 2) * soundspeedcm;
 
-  Serial.print("Sound :");
+  Serial.println("Sound :");
   Serial.print(soundspeedms);
   Serial.print(" m/s, ");
   Serial.print("Humidity:");
   Serial.print(hum);
   Serial.print("%, Temp:");
   Serial.print(temp);
-  Serial.println(" C | Distance:");
+  Serial.println(" C | Distances: ");
 
 
 
-
-  Serial.print("DistanceN is equal to ");
+  Serial.print("\t\t\t\t\t\t\t\t");
+  // tht was a bunch f tbats????
+  Serial.print("N:");
   if (distance >= 400 || distance <= 2) {
-    Serial.println("Out of range :(");
+    Serial.print("Out of range | ");
   }
 
   else {
 
     Serial.print(distance);
-    Serial.println(" cm");
-    delay(500);
+    Serial.print(" cm | ");
   }
-  Serial.print("DistanceE is equal to ");
+  Serial.print("E:");
   if (distanceE >= 400 || distanceE <= 2) {
-    Serial.println("Out of range :(");
+    Serial.print("Out of range | ");
   }
 
   else {
 
     Serial.print(distanceE);
-    Serial.println(" cm");
-    delay(500);
+    Serial.print(" cm | ");
   }
-  Serial.print("DistanceW is equal to ");
+  Serial.print("W:");
   if (distanceW >= 400 || distanceW <= 2) {
-    Serial.println("Out of range :(");
+    Serial.println("Out of range | ");
   }
 
   else {
 
     Serial.print(distanceW);
-    Serial.println(" cm");
-    delay(500);
+    Serial.print(" cm | ");
   }
-  delay(500);
 }
