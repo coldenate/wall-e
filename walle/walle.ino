@@ -16,6 +16,10 @@
 #define triggerPin 12
 #define echoPin 13
 
+const int buttonPin = 4;     // the number of the pushbutton pin
+
+int buttonState = 0;
+
 #define MAX_DISTANCE 400
 
 
@@ -38,6 +42,7 @@ float soundspeedms;
 float soundspeedcm;
 
 int iterations = 6;
+bool debug_mode = false;
 
 DHT dht(DHTPIN, DHTYPE);
 
@@ -45,6 +50,18 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   dht.begin();
+  pinMode(buttonPin, INPUT);
+  delay(3000);
+  buttonState = digitalRead(buttonPin);
+  if (buttonState == HIGH) {
+    debug_mode = true;    
+    Serial.println();
+    Serial.print("DEBUG MODE HAS BEEN ACTIVATED");
+    Serial.println();
+  } else {
+    debug_mode = false;
+  }
+  
 }
 
 void loop() {
@@ -68,18 +85,20 @@ void loop() {
   distance = (duration / 2) * soundspeedcm;
   distanceE = (durationE / 2) * soundspeedcm;
   distanceW = (durationW / 2) * soundspeedcm;
+  if (debug_mode == true) {
 
-  Serial.println("Sound :");
-  Serial.print(soundspeedms);
-  Serial.print(" m/s, ");
-  Serial.print("Humidity:");
-  Serial.print(hum);
-  Serial.print("%, Temp:");
-  Serial.print(temp);
-  Serial.println(" C | Distances: ");
+    Serial.println("Sound :");
+    Serial.print(soundspeedms);
+    Serial.print(" m/s, ");
+    Serial.print("Humidity:");
+    Serial.print(hum);
+    Serial.print("%, Temp:");
+    Serial.print(temp);
+    Serial.println(" C | Distances: ");
+  }
 
 
-
+  Serial.println();
   Serial.print("\t\t\t\t\t\t\t\t");
   // tht was a bunch f tbats????
   Serial.print("N:");
