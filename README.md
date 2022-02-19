@@ -7,6 +7,22 @@ The Robot Script is designed to have a constant flow of four-way proximity betwe
 Using Ultrasonic sound transmitters, we can gather this information every (approx. :/) 2 seconds. Using the temperature sensor, we can calculate proximity using the Speed of Sound.
 
 ## Pseudo Code Logic
+
+```mermaid
+flowchart TD
+  A{Program Init} --> B{"void setup()"} 
+  B{"void setup()"} ---  D{Debug_Mode} --> E{if button held for 3 seconds}
+  id1([Debug mode gives verbose serial output that prints out the on-board information technology readings.])
+  E --> C
+  B --> C{"void loop()"}
+  C --> id2
+  subgraph id2 [Direction Choice]
+  b1 -->b2
+  end
+
+
+```
+
 <spoilers> I'll make an image diagram some day </spoilers>
 
 ``` py
