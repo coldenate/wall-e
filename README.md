@@ -1,5 +1,5 @@
 # wall-e_bot
-“wAll•E”
+This repository holds the code for a 90° maze-solving robot car. Named after Wall•E because ultrasonic sensors look like the eyes of Wall•E!
 
 ## Purpose
 
