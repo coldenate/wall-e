@@ -10,11 +10,11 @@ Using Ultrasonic sound transmitters, we can gather this information every (appro
 
 ```mermaid
 flowchart TD
-  A{Program Init} --> B{"void setup()"} 
-  B{"void setup()"} ---  D{Debug_Mode} --> E{if button held for 3 seconds}
+  A[Program Init] --> B["void setup()"] 
+  B["void setup()"] ---  D[Debug_Mode] --> E[if button held for 3 seconds]
   id1([Debug mode gives verbose serial output that prints out the on-board information technology readings.])
   E --> C
-  B --> C{"void loop()"}
+  B --> C["void loop()"]
   C --> id2
   subgraph id2 [Direction Choice]
   b1 -->b2
@@ -25,7 +25,7 @@ flowchart TD
 
 <spoilers> I'll make an image diagram some day </spoilers>
 
-``` py
+```cpp
 Setup - Set correct pins
 Setup - Get Temperature Once. Only once per initialization.
 Setup - calibrate motors after a few seconds.
