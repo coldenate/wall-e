@@ -5,7 +5,7 @@
 #include "NewPing.h"
 
 
-#define DHTPIN 3
+#define DHTPIN 0
 // West
 #define trigPin_W 1
 #define echoPin_W 2
@@ -16,7 +16,7 @@
 #define triggerPin 5
 #define echoPin 6
 
-const int buttonPin = 4;     // the number of the pushbutton pin
+const int buttonPin = A5;     // the number of the pushbutton pin
 
 int buttonState = 0;
 
