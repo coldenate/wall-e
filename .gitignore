@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
 
+Autogen
+.vscode/
+
 # Compiled Object files
 *.slo
 *.lo
