@@ -1,5 +1,14 @@
-# wall-e_bot
+# Wall•E Robot!!
 This repository holds the code for a 90° maze-solving robot car. Named after Wall•E because ultrasonic sensors look like the eyes of Wall•E!
+
+# README TODO
+
+- [x] Rudimentary Explanation
+- [x] Layout
+- [ ] Add diagram for logic
+- [ ] Add diagram for wiring
+- [ ] Grammar check
+- [ ] Make repo public
 
 ## Purpose
 
@@ -9,7 +18,7 @@ Using Ultrasonic sound transmitters, we can gather this information every (appro
 ## Pseudo Code Logic
 
 ```mermaid
-flowchart TD
+flowchart TB
   A[Program Init] --> B["void setup()"] 
   B["void setup()"] ---  D[Debug_Mode] --> E[if button held for 3 seconds]
   id1([Debug mode gives verbose serial output that prints out the on-board information technology readings.])
@@ -22,8 +31,6 @@ flowchart TD
 
 
 ```
-
-<spoilers> I'll make an image diagram some day </spoilers>
 
 ```cpp
 Setup - Set correct pins
@@ -49,10 +56,22 @@ For a [Destination Imagination Challenge](https://www.destinationimagination.org
 
 ### Faq
 
-#### Are you aware your code is rudimentary?
+Are you aware your code is rudimentary?
 
 > Yes, I barely have an idea of how to use a keyboard.
 > Jokes aside, I am still a beginner in C++, and I am scared of classes.
+
+What is the total cost if I bought everything as new?
+
+> I am still working that one out. Hold on.
+
+What chip is the hardest to come by?
+
+> I would watch out for Motor Drivers. They are sneaky fellows. 
+
+How do I wire the robot up?
+
+> I forgot to post that. I will do that soon.
 
 # Legal Jargon
 `Copyright (c) 2022 Nate Solis`
