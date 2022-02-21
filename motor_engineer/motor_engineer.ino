@@ -7,7 +7,7 @@
 #define BIN2 12
 #define PWMA 9
 #define PWMB 10
-#define STBY 
+#define STBY 13
 
 // offsets? 
 const int offsetA = 1;
