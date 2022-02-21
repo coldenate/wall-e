@@ -7,14 +7,14 @@
 
 #define DHTPIN 3
 // West
-#define trigPin_W 8
-#define echoPin_W 9
+#define trigPin_W 1
+#define echoPin_W 2
 // East
-#define trigPin_E 10
-#define echoPin_E 11
+#define trigPin_E 3
+#define echoPin_E 4
 // North (all in terms of driving forward)
-#define triggerPin 12
-#define echoPin 13
+#define triggerPin 5
+#define echoPin 6
 
 const int buttonPin = 4;     // the number of the pushbutton pin
 
