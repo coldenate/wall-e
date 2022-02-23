@@ -7,14 +7,14 @@
 
 #define DHTPIN A4
 // West
-#define trigPin_W 3
+#define trigPin_W 3 // black
 #define echoPin_W 3
 // East
 #define trigPin_E 5
-#define echoPin_E 5
+#define echoPin_E 5 // qwhite
 // North (all in terms of driving forward)
 #define triggerPin 6
-#define echoPin 6
+#define echoPin 6 //oramge
 
 const int buttonPin = A5;     // the number of the pushbutton pin
 
