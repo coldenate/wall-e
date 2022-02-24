@@ -72,21 +72,10 @@ bool stdf = true; //until proven otherwise
 bool Nsafe = false;
 bool Esafe; 
 bool Wsafe;
+bool just_turned = false;
 
 DHT dht(DHTPIN, DHTYPE);
 
-void smart_turn(int reference_point, int direction) {
-  if (direction == 1) {
-    while (distance != round(reference_point)) {
-      right(motor1, motor2, 255);
-    }
-  }
-  if (direction == 2) {
-    while (distance != round(reference_point)) {
-      left(motor1, motor2, 255);
-    }
-  }  
-}
 
 void setup() {
   // put your setup code here, to run once:
@@ -106,20 +95,18 @@ void setup() {
   
 }
 
-void loop() {
-
-
-
-// start of sos
+int sos() {
   hum = dht.readHumidity();
   temp = dht.readTemperature();
 
   soundspeedms = 331.4 + (0.606 * temp) + (0.0124 * hum);
 
   soundspeedcm = soundspeedms / 10000;
+  return soundspeedcm;
+}
 
-  // end of  sos
-
+void find_prox() {
+  
   duration = sonar.ping_median(iterations);
   durationE = sonarE.ping_median(iterations);
   durationW = sonarW.ping_median(iterations);
@@ -130,6 +117,76 @@ void loop() {
   distanceE = (durationE / 2) * soundspeedcm;
   distanceW = (durationW / 2) * soundspeedcm;
   // end of gatehring distance
+ 
+}
+
+void loop() {
+
+  if (just_turned == true) {
+    just_turned = false;
+}
+  sos();
+
+  find_prox();
+  Serial.print(distance);
+  Serial.print(" cm NORTH | ");
+  Serial.print(distanceE);
+  Serial.print(" cm EAST | ");
+  Serial.print(distanceW);
+  Serial.print(" cm WEST | ");
+
+  if (distance >= 400 || distance <= 10) {// || is like or in python 
+    Nsafe = false;
+  }
+  if (distance >= 10) {
+    Nsafe = true;
+  }
+  if (distanceE >= 400 || distanceE <= 10) {// || is like or in python 
+    Esafe = false;
+  }
+  if (distanceE >= 10) {
+    Esafe = true;
+  }
+  if (distanceW >= 400 || distanceW <= 10) {// || is like or in python 
+    Wsafe = false;
+  }
+  if (distanceW >= 10) {
+    Wsafe = true;
+  }
+
+  if (just_turned == true) {
+    Serial.println("I just turned, so it has to be safe to go North.");
+  }// just turned trumnps everything
+  if (Nsafe == true && Wsafe == false && Esafe == false) {
+    // drive forward
+    Serial.println("Drive North");
+    
+  }
+  if (Nsafe == false) {
+    Serial.println("Dont drive north");
+
+  
+
+    if (Wsafe == true && Esafe == false && Nsafe == false) {
+      Serial.println("Turn left");
+    }
+    if (Wsafe == false && Esafe == true  && Nsafe == false) {
+      Serial.println("Turn right");
+    }
+    if (Wsafe == false && Esafe == false && Nsafe == false) {
+    Serial.println("dead end"); //berskerk mode
+    }
+    if (Wsafe == true && Esafe == true && Nsafe == false) {
+      Serial.println("fork in the road that I can't yet handle. I can turn left and right.");
+    }
+  }
+  if (Wsafe == true && Esafe == true && Nsafe == true) {
+    Serial.println("Driving north in an open field"); //berskerk mode
+  }
+  
+  
+
+  // this was for north
 
   if (debug_mode == true) {
 
@@ -146,71 +203,6 @@ void loop() {
 
   Serial.println();
   Serial.print("\t\t\t\t\t\t\t\t");
-  // tht was a bunch f tbats????
-
-  if (distance >= 400 || distance <= 10) {
-    Nsafe = false;
-    if (debug_mode == true) {
-    Serial.print("NOut of range | ");}
-  }
-
-  else {
-    Nsafe=true;
-    if (debug_mode == true) {
-    Serial.print(distance);
-    Serial.print(" cm NORTH | ");}
-  }
-  if (distanceE >= 400 || distanceE <= 10) {
-    Esafe = false;
-    if (debug_mode == true) {
-    Serial.print("EOut of range | ");
-  }}
-
-  else {
-    Esafe=true;
-    if (debug_mode == true) {
-    Serial.print(distanceE);
-    Serial.print(" cm EAST | ");}
-  }
-  if (distanceW >= 400 || distanceW <=10) {
-    Wsafe=false;
-    if (debug_mode == true) {
-    Serial.println("WOut of range | ");
-  }}
-
-  else {
-    Wsafe=true;
-    if (debug_mode == true) {
-    Serial.print(distanceW);
-    Serial.print(" cm WEST | ");}
-  }
- 
-  if (Nsafe == true) {
-    stdf=true;
-    Serial.println("I am driving forward");
-    motor1.drive(150);
-    motor2.drive(150);
-  }
-  if (Nsafe==false) {
-    Serial.println("Wait crap there is dead end man cmon. Traffic jammmm");
-    stdf=false;
-    // at this point, the decision tree will decide if we should turn left or right
-    if (Wsafe == true) {
-      // turn left
-      Serial.print("Turn leftt");
-      if (distance != round(distanceW)) {
-      left(motor1, motor2, 255);}
-      Nsafe = true;
-    }
-    if (Esafe == true) {
-      // turn right
-      Serial.print("Turn right");
-      if (distance != round(distanceE)) {
-      right(motor1, motor2, 255);
-    }
-      Nsafe = true;
-    }
-  }
-
+  
   
 }
