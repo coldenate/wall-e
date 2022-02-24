@@ -1,3 +1,46 @@
+## Pseudo Code Logic
+
+```mermaid
+flowchart TB
+  A[ATmegaChip Init] --> B["void setup()"] 
+  B(["void setup()"]) ---  D[Debug_Mode] --> E["Check for button held (3 Seconds window)"]
+  id1([Debug mode gives verbose serial output that prints out the on-board information technology readings.])
+  E --> C["Begin Temp+Humidity Data Collection"]
+  B --> C
+  C --> G["Begin Ultrasonic Sensor pinging"]
+  G --> idloop
+  idloop(["void loop()"])
+  idloop --> id2
+  subgraph id2 [on-board Sensory Data Computation]
+  idping[Read the current Ultrasonic Sound Reading] --> idequ[calculations]
+  iddht[Temperature and Humidity Data read] --> idequ
+  idequ-->iddist[Distance Calculation]
+  end
+  idloop --> id3
+  id2 --> id3
+  subgraph id3["Decision tree declarations"]
+  idN["Decide if North"]
+  idN --> l["Is Northern wall closer than x cm?"]
+  iddist --> l
+  l -- Yes --> idDec["Declare Northern Side blocked to drive"]
+  l -- No --> idDecno["Declare Northern Side safe to Drive"]
+  idE["Decide if East"]
+  idE --> k["Is Eastern Wall closer than x cm?"]
+  iddist --> k
+  k -- Yes --> idDecE["Declare Eastern blocked to drive"]
+  k -- No --> idDecEno["Declare Eastern safe to drive"]
+  idW["Decide if West"]
+  idW --> I["Is Western Wall closer than x cm?"]
+  iddist --> I
+  I -- Yes --> idDecW["Declare Western blocked to drive"]
+  I -- No --> idDecWno["Declare Western Safe to drive"]
+  end
+  id3 --> id4
+  subgraph id4["Driving Execution"]
+  
+  end
+
+```
 # Wall•E Robot!!
 This repository holds the code for a 90° maze-solving robot car. Named after Wall•E because ultrasonic sensors look like the eyes of Wall•E!
 
@@ -15,22 +58,7 @@ This repository holds the code for a 90° maze-solving robot car. Named after Wa
 The Robot Script is designed to have a constant flow of four-way proximity between the robot and walls surrounding it.
 Using Ultrasonic sound transmitters, we can gather this information every (approx. :/) 2 seconds. Using the temperature sensor, we can calculate proximity using the Speed of Sound.
 
-## Pseudo Code Logic
 
-```mermaid
-flowchart TB
-  A[Program Init] --> B["void setup()"] 
-  B["void setup()"] ---  D[Debug_Mode] --> E[if button held for 3 seconds]
-  id1([Debug mode gives verbose serial output that prints out the on-board information technology readings.])
-  E --> C
-  B --> C["void loop()"]
-  C --> id2
-  subgraph id2 [Direction Choice]
-  b1 -->b2
-  end
-
-
-```
 
 ```cpp
 Setup - Set correct pins
