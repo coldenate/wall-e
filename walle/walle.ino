@@ -1,8 +1,33 @@
+/*
+  Maze Completing Robot Monoscript
 
-// ITS WALLE
+  This sketch contains the on-board decision making for the maze-solver project.
 
+  by Nate Solis
+
+  Licensed with MIT License
+  Please do not use this code in an opposing DI situation. :) This is a simple request. If you are Dr. Doofenshmirtz, I cannot do anything about it.
+  Copyright (c) 2022 Nate Solis
+*/
+
+#include <SparkFun_TB6612.h>
 #include "DHT.h"
 #include "NewPing.h"
+
+#define AIN1 7
+#define BIN1 11
+#define AIN2 8
+#define BIN2 12
+#define PWMA 9
+#define PWMB 10
+#define STBY 13
+
+// offsets? 
+const int offsetA = 1;
+const int offsetB = 1;
+
+Motor motor1 = Motor(AIN1, AIN2, PWMA, offsetA, STBY);
+Motor motor2 = Motor(BIN1, BIN2, PWMB, offsetB, STBY);
 
 
 #define DHTPIN A4
@@ -44,11 +69,24 @@ float soundspeedcm;
 int iterations = 6;
 bool debug_mode = false;
 bool stdf = true; //until proven otherwise
-bool Nsafe;
+bool Nsafe = false;
 bool Esafe; 
 bool Wsafe;
 
 DHT dht(DHTPIN, DHTYPE);
+
+void smart_turn(int reference_point, int direction) {
+  if (direction == 1) {
+    while (distance != round(reference_point)) {
+      right(motor1, motor2, 255);
+    }
+  }
+  if (direction == 2) {
+    while (distance != round(reference_point)) {
+      left(motor1, motor2, 255);
+    }
+  }  
+}
 
 void setup() {
   // put your setup code here, to run once:
@@ -72,7 +110,7 @@ void loop() {
 
 
 
-
+// start of sos
   hum = dht.readHumidity();
   temp = dht.readTemperature();
 
@@ -80,15 +118,19 @@ void loop() {
 
   soundspeedcm = soundspeedms / 10000;
 
-  // end of temperature sensor data collection
+  // end of  sos
 
   duration = sonar.ping_median(iterations);
   durationE = sonarE.ping_median(iterations);
   durationW = sonarW.ping_median(iterations);
 
+// gathering distance
+
   distance = (duration / 2) * soundspeedcm;
   distanceE = (durationE / 2) * soundspeedcm;
   distanceW = (durationW / 2) * soundspeedcm;
+  // end of gatehring distance
+
   if (debug_mode == true) {
 
     Serial.println("Sound :");
@@ -106,7 +148,7 @@ void loop() {
   Serial.print("\t\t\t\t\t\t\t\t");
   // tht was a bunch f tbats????
 
-  if (distance >= 400 || distance <= 5) {
+  if (distance >= 400 || distance <= 10) {
     Nsafe = false;
     if (debug_mode == true) {
     Serial.print("NOut of range | ");}
@@ -118,7 +160,7 @@ void loop() {
     Serial.print(distance);
     Serial.print(" cm NORTH | ");}
   }
-  if (distanceE >= 400 || distanceE <= 5) {
+  if (distanceE >= 400 || distanceE <= 10) {
     Esafe = false;
     if (debug_mode == true) {
     Serial.print("EOut of range | ");
@@ -130,7 +172,7 @@ void loop() {
     Serial.print(distanceE);
     Serial.print(" cm EAST | ");}
   }
-  if (distanceW >= 400 || distanceW <=5) {
+  if (distanceW >= 400 || distanceW <=10) {
     Wsafe=false;
     if (debug_mode == true) {
     Serial.println("WOut of range | ");
@@ -142,9 +184,12 @@ void loop() {
     Serial.print(distanceW);
     Serial.print(" cm WEST | ");}
   }
+ 
   if (Nsafe == true) {
     stdf=true;
     Serial.println("I am driving forward");
+    motor1.drive(150);
+    motor2.drive(150);
   }
   if (Nsafe==false) {
     Serial.println("Wait crap there is dead end man cmon. Traffic jammmm");
@@ -153,10 +198,17 @@ void loop() {
     if (Wsafe == true) {
       // turn left
       Serial.print("Turn leftt");
+      if (distance != round(distanceW)) {
+      left(motor1, motor2, 255);}
+      Nsafe = true;
     }
     if (Esafe == true) {
       // turn right
       Serial.print("Turn right");
+      if (distance != round(distanceE)) {
+      right(motor1, motor2, 255);
+    }
+      Nsafe = true;
     }
   }
 
