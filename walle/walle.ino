@@ -73,19 +73,21 @@ bool Nsafe = false;
 bool Esafe; 
 bool Wsafe;
 bool just_turned = false;
+bool driving;
+bool is_turning;
 
 DHT dht(DHTPIN, DHTYPE);
 
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
   dht.begin();
   pinMode(buttonPin, INPUT);
   delay(3000);
   buttonState = digitalRead(buttonPin);
   if (buttonState == HIGH) {
     debug_mode = true;    
+    Serial.begin(9600);
     Serial.println();
     Serial.print("DEBUG MODE HAS BEEN ACTIVATED");
     Serial.println();
@@ -106,6 +108,7 @@ int sos() {
 }
 
 void find_prox() {
+  sos();
   
   duration = sonar.ping_median(iterations);
   durationE = sonarE.ping_median(iterations);
@@ -125,45 +128,52 @@ void loop() {
   if (just_turned == true) {
     just_turned = false;
 }
-  sos();
 
   find_prox();
-  Serial.print(distance);
-  Serial.print(" cm NORTH | ");
-  Serial.print(distanceE);
-  Serial.print(" cm EAST | ");
-  Serial.print(distanceW);
-  Serial.print(" cm WEST | ");
-
-  if (distance >= 400 || distance <= 10) {// || is like or in python 
+  if (debug_mode == true) {
+    Serial.print(distance);
+    Serial.print(" cm NORTH | ");
+    Serial.print(distanceE);
+    Serial.print(" cm EAST | ");
+    Serial.print(distanceW);
+    Serial.print(" cm WEST | ");
+}
+  if (driving == true) {
+    if (distance >= 400 || distance <= 15) {// || is like or in python 
+      Nsafe = false;
+    }
+    if (distance >= 15) {
+      Nsafe = true;
+    }
+}
+  else {
+  if (distance >= 400 || distance <= 15) {// || is like or in python 
     Nsafe = false;
   }
-  if (distance >= 10) {
+  if (distance >= 15) {
     Nsafe = true;
   }
-  if (distanceE >= 400 || distanceE <= 10) {// || is like or in python 
+  if (distanceE >= 400 || distanceE <= 15) {// || is like or in python 
     Esafe = false;
   }
-  if (distanceE >= 10) {
+  if (distanceE >= 15) {
     Esafe = true;
   }
-  if (distanceW >= 400 || distanceW <= 10) {// || is like or in python 
+  if (distanceW >= 400 || distanceW <= 15) {// || is like or in python 
     Wsafe = false;
   }
-  if (distanceW >= 10) {
+  if (distanceW >= 15) {
     Wsafe = true;
   }
-
+  }
   if (just_turned == true) {
     Serial.println("I just turned, so it has to be safe to go North.");
   }// just turned trumnps everything
-  if (Nsafe == true && Wsafe == false && Esafe == false) {
-    // drive forward
-    Serial.println("Drive North");
-    
-  }
   if (Nsafe == false) {
+    motor1.brake();
+    motor2.brake();
     Serial.println("Dont drive north");
+    driving = false;
 
   
 
@@ -179,6 +189,14 @@ void loop() {
     if (Wsafe == true && Esafe == true && Nsafe == false) {
       Serial.println("fork in the road that I can't yet handle. I can turn left and right.");
     }
+  }
+  if (Nsafe == true && Wsafe == false && Esafe == false) {
+    // drive forward
+    motor1.drive(150); 
+    motor2.drive(150);
+    Serial.println("Drive North"); 
+    driving = true;
+    
   }
   if (Wsafe == true && Esafe == true && Nsafe == true) {
     Serial.println("Driving north in an open field"); //berskerk mode
