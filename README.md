@@ -1,4 +1,4 @@
-<!-- # Wall•E Robot!!
+# Wall•E Robot!!
 This repository holds the code for a 90° maze-solving robot car. Named after Wall•E because ultrasonic sensors look like the eyes of Wall•E!
 
 # README TODO
@@ -15,7 +15,7 @@ This repository holds the code for a 90° maze-solving robot car. Named after Wa
 The Robot Script is designed to have a constant flow of four-way proximity between the robot and walls surrounding it.
 Using Ultrasonic sound transmitters, we can gather this information every (approx. :/) 2 seconds. Using the temperature sensor, we can calculate proximity using the Speed of Sound.
 
-## Pseudo Logic -->
+## Pseudo Logic
 
 ```mermaid
 flowchart LR
