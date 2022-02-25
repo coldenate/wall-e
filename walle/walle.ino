@@ -40,8 +40,9 @@ Motor motor2 = Motor(BIN1, BIN2, PWMB, offsetB, STBY);
 // North (all in terms of driving forward)
 #define triggerPin 6
 #define echoPin 6 //oramge
+#define buttonPin 4
 
-const int buttonPin = A5;     // the number of the pushbutton pin
+// const int buttonPin = 4;     // the number of the pushbutton pin
 
 int buttonState = 0;
 
@@ -94,8 +95,9 @@ void setup() {
     debug_mode = true;    
     Serial.begin(9600);
     Serial.println();
-    Serial.print("DEBUG MODE HAS BEEN ACTIVATED");
+    Serial.print("DEBUG MODE HAS BEEN ACTIVATED - TURNING OFF MOTORS");
     Serial.println();
+    
   } else {
     debug_mode = false;
   }
@@ -173,7 +175,7 @@ void turn_right(bool first, float distanceE) {
   inRange(turning_dest-2, turning_dest+2, distance)? is_turningR = false: is_turningR = true;
   
   if (is_turningR == true){
-    turn_left(false, distanceW);
+    turn_right(false, distanceW);
     
     }
   if (is_turningR==false){
@@ -265,7 +267,7 @@ void loop() {
     }
     if (Wsafe == false && Esafe == true  && Nsafe == false) {
       Serial.println("Turn right");
-      turn_right(true, distanceW);
+      turn_right(true, distanceE);
     }
     if (Wsafe == false && Esafe == false && Nsafe == false) {
     Serial.println("dead end"); //berskerk mode
