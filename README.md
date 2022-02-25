@@ -1,4 +1,4 @@
-# Wall•E Robot!!
+<!-- # Wall•E Robot!!
 This repository holds the code for a 90° maze-solving robot car. Named after Wall•E because ultrasonic sensors look like the eyes of Wall•E!
 
 # README TODO
@@ -15,26 +15,38 @@ This repository holds the code for a 90° maze-solving robot car. Named after Wa
 The Robot Script is designed to have a constant flow of four-way proximity between the robot and walls surrounding it.
 Using Ultrasonic sound transmitters, we can gather this information every (approx. :/) 2 seconds. Using the temperature sensor, we can calculate proximity using the Speed of Sound.
 
-## Pseudo Logic
+## Pseudo Logic -->
 
 ```mermaid
 flowchart LR
+  subgraph idinit["Chip Init"]
   A[ATmegaChip Init] --> B["void setup()"] 
   B(["void setup()"]) ---  D[Debug_Mode] --> E["Check for button held (3 Seconds window)"]
   id1([Debug mode gives verbose serial output that prints out the on-board information technology readings.])
   E --> C["Begin Temp+Humidity Data Collection"]
   B --> C
   C --> G["Begin Ultrasonic Sensor pinging"]
+  end
+  subgraph idloopmaster["The Whole Loop Function"]
+  
   G --> idloop
+
   idloop(["void loop()"])
   idloop --> id2
+  
+  
   subgraph id2 [on-board Sensory Data Computation]
   idping[Read the current Ultrasonic Sound Reading] --> idequ[calculations]
   iddht[Temperature and Humidity Data read] --> idequ
   idequ-->iddist[Distance Calculation]
   end
-  idloop --> id3
-  id2 --> id3
+
+  id2 --> idthresh
+  iddist --> idthresh
+  subgraph idthresh["Dynamic Threshold Generation"]
+  end
+  idthresh --> id3
+  idthresh --> id4
   subgraph id3["Decision tree declarations"]
   idN["Decide if North"]
   idN --> l["Is Northern wall closer than x cm?"]
@@ -65,6 +77,7 @@ flowchart LR
   id8 --> idblockr
   end
   id4 --> idloop
+  end
 ```
 Flowchart is newer than the code below.
 
