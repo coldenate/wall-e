@@ -73,8 +73,13 @@ bool Nsafe = false;
 bool Esafe; 
 bool Wsafe;
 bool just_turned = false;
-bool driving;
-bool is_turning;
+bool driving = false;
+bool is_turningL = false;
+bool is_turningR= false;
+float turning_dest;
+bool inRange(unsigned low, unsigned high, unsigned x){
+  return (low <= x && x <= high);     
+}
 
 DHT dht(DHTPIN, DHTYPE);
 
@@ -123,13 +128,49 @@ void find_prox() {
  
 }
 
+void turn_left(bool first, float distanceW) {
+  is_turningL = true;
+  if (first==true){
+    Serial.println("Reset turning dest");
+    turning_dest = distanceW;
+  }
+  left(motor1,motor2, 250);
+  Serial.println("The turning desitnation is:");
+  Serial.print(turning_dest);
+  Serial.println(" But the north is");
+  // delay(250);
+  // brake(motor1,motor2);
+  find_prox();
+  Serial.print(distance);
+  inRange(turning_dest-2, turning_dest+2, distance)? is_turningL = false: is_turningL = true;
+  
+  if (is_turningL == true){
+    turn_left(false, distanceW);
+    
+    }
+  if (is_turningL==false){
+  brake(motor1,motor2);
+  just_turned = true;
+  Serial.print("WE HAVE TURNED");
+  
+  
+  }
+  }
+
 void loop() {
+  find_prox();
+  if (is_turningL==true){
+    turn_left(false, distanceW);
+  }    
+    
+  
+    
 
   if (just_turned == true) {
     just_turned = false;
 }
 
-  find_prox();
+  
   if (debug_mode == true) {
     Serial.print(distance);
     Serial.print(" cm NORTH | ");
@@ -188,6 +229,7 @@ void loop() {
 
     if (Wsafe == true && Esafe == false && Nsafe == false) {
       Serial.println("Turn left");
+      turn_left(true, distanceW);
     }
     if (Wsafe == false && Esafe == true  && Nsafe == false) {
       Serial.println("Turn right");
