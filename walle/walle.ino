@@ -30,7 +30,7 @@ Motor motor1 = Motor(AIN1, AIN2, PWMA, offsetA, STBY);
 Motor motor2 = Motor(BIN1, BIN2, PWMB, offsetB, STBY);
 
 
-#define DHTPIN A4
+#define DHTPIN 2
 // West
 #define trigPin_W 3 // black
 #define echoPin_W 3
@@ -151,7 +151,35 @@ void turn_left(bool first, float distanceW) {
   if (is_turningL==false){
   brake(motor1,motor2);
   just_turned = true;
-  Serial.print("WE HAVE TURNED");
+  Serial.print("WE HAVE TURNED LEFt");
+  
+  
+  }
+  }
+void turn_right(bool first, float distanceE) {
+  is_turningR = true;
+  if (first==true){
+    Serial.println("Reset turning dest");
+    turning_dest = distanceE;
+  }
+  right(motor1,motor2, 250);
+  Serial.println("The turning desitnation is:");
+  Serial.print(turning_dest);
+  Serial.println(" But the north is");
+  // delay(250);
+  // brake(motor1,motor2);
+  find_prox();
+  Serial.print(distance);
+  inRange(turning_dest-2, turning_dest+2, distance)? is_turningR = false: is_turningR = true;
+  
+  if (is_turningR == true){
+    turn_left(false, distanceW);
+    
+    }
+  if (is_turningR==false){
+  brake(motor1,motor2);
+  just_turned = true;
+  Serial.print("WE HAVE TURNED RIGHt");
   
   
   }
@@ -162,11 +190,15 @@ void loop() {
   if (is_turningL==true){
     turn_left(false, distanceW);
   }    
+  if (is_turningR==true){
+    turn_right(false, distanceW);
+  }    
     
   
     
 
   if (just_turned == true) {
+    driving = true;    
     just_turned = false;
 }
 
@@ -233,6 +265,7 @@ void loop() {
     }
     if (Wsafe == false && Esafe == true  && Nsafe == false) {
       Serial.println("Turn right");
+      turn_right(true, distanceW);
     }
     if (Wsafe == false && Esafe == false && Nsafe == false) {
     Serial.println("dead end"); //berskerk mode
