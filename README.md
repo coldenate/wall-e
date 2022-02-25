@@ -44,9 +44,13 @@ flowchart LR
   id2 --> idthresh
   iddist --> idthresh
   subgraph idthresh["Dynamic Threshold Generation"]
+  idblockhalt["Halt all movement for 5 seconds"] --> idreadsensors
+  idreadsensors["Read the ultrasonic sensors assuming placed in a wall."] --> idanalyze["Analyze sensors EAST + WEST and create buffer range for them."]
+  idsensor(["Northern Sensor Omitted"])
+  idanalyze --> iddocument(["Input the calculations into variable that will never be changed until reset"])
   end
   idthresh --> id3
-  idthresh --> id4
+  iddocument --> id3
   subgraph id3["Decision tree declarations"]
   idN["Decide if North"]
   idN --> l["Is Northern wall closer than x cm?"]
