@@ -5,7 +5,7 @@ This repository holds the code for a 90° maze-solving robot car. Named after Wa
 
 - [x] Rudimentary Explanation
 - [x] Layout
-- [ ] Add diagram for logic
+- [x] Add diagram for logic
 - [ ] Add diagram for wiring
 - [ ] Grammar check
 - [ ] Make repo public
