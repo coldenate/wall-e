@@ -95,7 +95,7 @@ void dynathresh() {
   and make it drive into the maze, see the ultras change drastically (negativly), then run this calibration. This is a good idea, but the time I have to implement it is short.
   */
   brake(motor1, motor2);
-  delay(5000); // this makes sure it can truly calibrate. 
+  delay(1000); // this makes sure it can truly calibrate. 
   find_prox();
   EDynaThresh = round(distanceE);
   WDynaThresh = round(distanceW);
@@ -181,8 +181,6 @@ void turn_left(bool first, float distanceW) {
   just_turned = true;
   is_turningL = false;  
   Serial.print("WE HAVE TURNED LEFt");
-  
-  
   }
   }
 void turn_right(bool first, float distanceE) {
@@ -224,10 +222,6 @@ void loop() {
   if (is_turningR==true){
     turn_right(false, distanceW);
   }
-    
-  
-    
-
 
   if (just_turned == false){
   /* if we have not just turned, we need to do scanning. 
@@ -245,42 +239,49 @@ void loop() {
       Serial.print(" cm WEST | ");
   }
     if (driving == true) {
-      if (distance >= 400 || distance <= 21) {// || is like or in python 
-        Nsafe = false;
+        inRange(20-4, 20+4, distance)? Nsafe = false: Nsafe = true; //if the northern distance is in range of a bubble of 20, decide safety
+
+        if (Nsafe == false) {
         brake(motor1,motor2);
         back(motor1,motor2,150);
-        delay(350);
+        delay(150); // correction for being cloesup salll
         brake(motor1,motor2);
 
         Serial.println("Dont drive north");
         driving = false;
-
-      }
-      if (distance >= 20) {
-        Nsafe = true;
-      }
+    }
+      
+     
   }
     else {
-    if (distance >= 400 || distance <= 21) {// || is like or in python 
-      Nsafe = false;
-    }
-    if (distance >= 21) {
-      Nsafe = true;
-    }
-    if (distanceE >= 400 || distanceE <= EDynaThresh) {// || is like or in python 
-      Esafe = false;
-    }
-    if (distanceE >= EDynaThresh) {
-      Esafe = true;
-    }
-    if (distanceW >= 400 || distanceW <= WDynaThresh) {// || is like or in python 
-      Wsafe = false;
-    }
-    if (distanceW >= WDynaThresh) {
-      Wsafe = true;
-    }
-    }
-  }
+
+    inRange(20-4, 20+4, distance)? Nsafe = false: Nsafe = true; //if the northern distance is in range of a bubble of 20, decide safety
+    
+
+    // if (distance >= 400 || distance <= 21) {// || is like or in python 
+    //   Nsafe = false;
+    // }
+    // if (distance >= 21) {
+    //   Nsafe = true;
+    // }
+
+    inRange(EDynaThresh-4, EDynaThresh+4, distanceE)? Esafe = false: Esafe = true;
+    // if (distanceE >= 400 || distanceE <= EDynaThresh) {// || is like or in python 
+    //   Esafe = false;
+    // }
+    // if (distanceE >= EDynaThresh) {
+    //   Esafe = true;
+    // }
+    inRange(WDynaThresh-4, WDynaThresh+4, distanceW)? Wsafe = false: Wsafe = true;
+
+    // if (distanceW >= 400 || distanceW <= WDynaThresh) {// || is like or in python 
+    //   Wsafe = false;
+    // }
+    // if (distanceW >= WDynaThresh) {
+    //   Wsafe = true;
+    // }
+    // }
+  }}
   if (just_turned == true) {
     Serial.println("I just turned, so it has to be safe to go North.");
     Nsafe = true;
@@ -351,4 +352,5 @@ void loop() {
   Serial.print("\t\t\t\t\t\t\t\t");
   }
   
+
 }
