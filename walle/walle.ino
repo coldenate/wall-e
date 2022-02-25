@@ -152,7 +152,9 @@ void turn_left(bool first, float distanceW) {
     }
   if (is_turningL==false){
   brake(motor1,motor2);
+  delay(250);
   just_turned = true;
+  is_turningL = false;  
   Serial.print("WE HAVE TURNED LEFt");
   
   
@@ -180,7 +182,9 @@ void turn_right(bool first, float distanceE) {
     }
   if (is_turningR==false){
   brake(motor1,motor2);
+  delay(250);
   just_turned = true;
+  is_turningR = false;
   Serial.print("WE HAVE TURNED RIGHt");
   
   
@@ -194,63 +198,70 @@ void loop() {
   }    
   if (is_turningR==true){
     turn_right(false, distanceW);
-  }    
+  }
     
   
     
 
-  if (just_turned == true) {
-    driving = true;    
-    just_turned = false;
-}
 
-  
-  if (debug_mode == true) {
-    Serial.print(distance);
-    Serial.print(" cm NORTH | ");
-    Serial.print(distanceE);
-    Serial.print(" cm EAST | ");
-    Serial.print(distanceW);
-    Serial.print(" cm WEST | ");
-}
-  if (driving == true) {
-    if (distance >= 400 || distance <= 20) {// || is like or in python 
+  if (just_turned == false){
+  /* if we have not just turned, we need to do scanning. 
+  If we have turned, we know the instance of the loop that chose to turn knew the turn lane was safe,
+  so this is a way to carry that knowledge over to the second in-line instance/iteration of the loop. 
+  */
+
+    
+    if (debug_mode == true) {
+      Serial.print(distance);
+      Serial.print(" cm NORTH | ");
+      Serial.print(distanceE);
+      Serial.print(" cm EAST | ");
+      Serial.print(distanceW);
+      Serial.print(" cm WEST | ");
+  }
+    if (driving == true) {
+      if (distance >= 400 || distance <= 25) {// || is like or in python 
+        Nsafe = false;
+        brake(motor1,motor2);
+        back(motor1,motor2,150);
+        delay(350);
+        brake(motor1,motor2);
+
+        Serial.println("Dont drive north");
+        driving = false;
+
+      }
+      if (distance >= 20) {
+        Nsafe = true;
+      }
+  }
+    else {
+    if (distance >= 400 || distance <= 25) {// || is like or in python 
       Nsafe = false;
-      brake(motor1,motor2);
-      back(motor1,motor2,150);
-      delay(350);
-      brake(motor1,motor2);
-
-      Serial.println("Dont drive north");
-      driving = false;
-
     }
     if (distance >= 20) {
       Nsafe = true;
     }
-}
-  else {
-  if (distance >= 400 || distance <= 20) {// || is like or in python 
-    Nsafe = false;
-  }
-  if (distance >= 20) {
-    Nsafe = true;
-  }
-  if (distanceE >= 400 || distanceE <= 12) {// || is like or in python 
-    Esafe = false;
-  }
-  if (distanceE >= 12) {
-    Esafe = true;
-  }
-  if (distanceW >= 400 || distanceW <= 12) {// || is like or in python 
-    Wsafe = false;
-  }
-  if (distanceW >= 12) {
-    Wsafe = true;
-  }
+    if (distanceE >= 400 || distanceE <= 12) {// || is like or in python 
+      Esafe = false;
+    }
+    if (distanceE >= 12) {
+      Esafe = true;
+    }
+    if (distanceW >= 400 || distanceW <= 12) {// || is like or in python 
+      Wsafe = false;
+    }
+    if (distanceW >= 12) {
+      Wsafe = true;
+    }
+    }
   }
   if (just_turned == true) {
     Serial.println("I just turned, so it has to be safe to go North.");
+    Nsafe = true;
+    Wsafe = false;
+    Esafe = false;
+    just_turned = false;
   }// just turned trumnps everything
   if (Nsafe == false) {
     // motor1.brake();
@@ -281,6 +292,7 @@ void loop() {
     forward(motor1,motor2,150);
     Serial.println("Drive North"); 
     driving = true;
+    
     
   }
   if (Wsafe == true && Esafe == true && Nsafe == true) {
