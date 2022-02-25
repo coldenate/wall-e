@@ -78,6 +78,7 @@ bool driving = false;
 bool is_turningL = false;
 bool is_turningR= false;
 float turning_dest;
+bool ignore_north = false; // this is for ramming objects when in open field.
 bool inRange(unsigned low, unsigned high, unsigned x){
   return (low <= x && x <= high);     
 }
@@ -220,7 +221,7 @@ void loop() {
       Serial.print(" cm WEST | ");
   }
     if (driving == true) {
-      if (distance >= 400 || distance <= 25) {// || is like or in python 
+      if (distance >= 400 || distance <= 21) {// || is like or in python 
         Nsafe = false;
         brake(motor1,motor2);
         back(motor1,motor2,150);
@@ -236,10 +237,10 @@ void loop() {
       }
   }
     else {
-    if (distance >= 400 || distance <= 25) {// || is like or in python 
+    if (distance >= 400 || distance <= 21) {// || is like or in python 
       Nsafe = false;
     }
-    if (distance >= 20) {
+    if (distance >= 21) {
       Nsafe = true;
     }
     if (distanceE >= 400 || distanceE <= 12) {// || is like or in python 
@@ -282,9 +283,14 @@ void loop() {
     }
     if (Wsafe == false && Esafe == false && Nsafe == false) {
     Serial.println("dead end"); //berskerk mode
+    back(motor1, motor2, 150);
+    delay(2000);
     }
     if (Wsafe == true && Esafe == true && Nsafe == false) {
       Serial.println("fork in the road that I can't yet handle. I can turn left and right.");
+      // back(motor1, motor2, 150);
+      // delay(2000);
+      return 0;
     }
   }
   if (Nsafe == true && Wsafe == false && Esafe == false) {
@@ -297,6 +303,7 @@ void loop() {
   }
   if (Wsafe == true && Esafe == true && Nsafe == true) {
     Serial.println("Driving north in an open field"); //berskerk mode
+    forward(motor1, motor2, 250)
   }
   
   
@@ -313,11 +320,11 @@ void loop() {
     Serial.print("%, Temp:");
     Serial.print(temp);
     Serial.println(" C | Distances: ");
-  }
+  
 
 
   Serial.println();
   Serial.print("\t\t\t\t\t\t\t\t");
-  
+  }
   
 }
