@@ -139,30 +139,38 @@ void loop() {
     Serial.print(" cm WEST | ");
 }
   if (driving == true) {
-    if (distance >= 400 || distance <= 15) {// || is like or in python 
+    if (distance >= 400 || distance <= 20) {// || is like or in python 
       Nsafe = false;
+      brake(motor1,motor2);
+      back(motor1,motor2,150);
+      delay(350);
+      brake(motor1,motor2);
+
+      Serial.println("Dont drive north");
+      driving = false;
+
     }
-    if (distance >= 15) {
+    if (distance >= 20) {
       Nsafe = true;
     }
 }
   else {
-  if (distance >= 400 || distance <= 15) {// || is like or in python 
+  if (distance >= 400 || distance <= 20) {// || is like or in python 
     Nsafe = false;
   }
-  if (distance >= 15) {
+  if (distance >= 20) {
     Nsafe = true;
   }
-  if (distanceE >= 400 || distanceE <= 15) {// || is like or in python 
+  if (distanceE >= 400 || distanceE <= 12) {// || is like or in python 
     Esafe = false;
   }
-  if (distanceE >= 15) {
+  if (distanceE >= 12) {
     Esafe = true;
   }
-  if (distanceW >= 400 || distanceW <= 15) {// || is like or in python 
+  if (distanceW >= 400 || distanceW <= 12) {// || is like or in python 
     Wsafe = false;
   }
-  if (distanceW >= 15) {
+  if (distanceW >= 12) {
     Wsafe = true;
   }
   }
@@ -170,10 +178,11 @@ void loop() {
     Serial.println("I just turned, so it has to be safe to go North.");
   }// just turned trumnps everything
   if (Nsafe == false) {
-    motor1.brake();
-    motor2.brake();
-    Serial.println("Dont drive north");
-    driving = false;
+    // motor1.brake();
+    // motor2.brake();
+    // Serial.println("Dont drive north");
+    // driving = false;
+    // I moved the stopper function to the very top so it can be faster at realizing when to stop.
 
   
 
@@ -192,8 +201,7 @@ void loop() {
   }
   if (Nsafe == true && Wsafe == false && Esafe == false) {
     // drive forward
-    motor1.drive(150); 
-    motor2.drive(150);
+    forward(motor1,motor2,150);
     Serial.println("Drive North"); 
     driving = true;
     
