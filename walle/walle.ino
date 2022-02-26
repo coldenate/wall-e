@@ -68,6 +68,10 @@ float soundspeedms;
 float soundspeedcm;
 
 int iterations = 6;
+int EDynaThreshLow = 8;
+int EDynaThreshHigh = 14;
+int WDynaThreshLow = 8;
+int WDynaThreshHigh = 14;
 bool debug_mode = false;
 bool stdf = true; //until proven otherwise
 bool Nsafe = false;
@@ -78,18 +82,35 @@ bool driving = false;
 bool is_turningL = false;
 bool is_turningR= false;
 float turning_dest;
+bool ignore_north = false; // this is for ramming objects when in open field.
 bool inRange(unsigned low, unsigned high, unsigned x){
   return (low <= x && x <= high);     
 }
 
 DHT dht(DHTPIN, DHTYPE);
 
+void dynathresh() {
+  /*
+  This function may be iffy, but it should improve accuracy. 
+  dynamic maze wall proximity threshold detection.
+  This function will be designed to run at setup. We will need to place it in the maze walls at setup unless we want to advance the function
+  and make it drive into the maze, see the ultras change drastically (negativly), then run this calibration. This is a good idea, but the time I have to implement it is short.
+  */
+  brake(motor1, motor2);
+  delay(1000); // this makes sure it can truly calibrate. 
+  find_prox();
+  EDynaThreshLow = round(distanceE-4);
+  EDynaThreshHigh = round(distanceE+4);
+  WDynaThreshLow = round(distanceW-4);
+  WDynaThreshHigh = round(distanceW+4);
+}
+
 
 void setup() {
   // put your setup code here, to run once:
   dht.begin();
   pinMode(buttonPin, INPUT);
-  delay(3000);
+  dynathresh();
   buttonState = digitalRead(buttonPin);
   if (buttonState == HIGH) {
     debug_mode = true;    
@@ -97,10 +118,15 @@ void setup() {
     Serial.println();
     Serial.print("DEBUG MODE HAS BEEN ACTIVATED - TURNING OFF MOTORS");
     Serial.println();
+    // Serial.print("Establish Edynathresh as");
+    // Serial.println(EDynaThresh);
+    // Serial.print("Establish WdDynaThresh as");
+    // Serial.println(WDynaThresh);
     
   } else {
     debug_mode = false;
   }
+  
   
 }
 
@@ -115,6 +141,10 @@ int sos() {
 }
 
 void find_prox() {
+  /* 
+  Runs the proximity checks
+  we can call this function at anytime to improve the accuracy of our time sitatuion.
+  */
   sos();
   
   duration = sonar.ping_median(iterations);
@@ -133,13 +163,13 @@ void find_prox() {
 void turn_left(bool first, float distanceW) {
   is_turningL = true;
   if (first==true){
-    Serial.println("Reset turning dest");
+    // Serial.println("Reset turning dest");
     turning_dest = distanceW;
   }
   left(motor1,motor2, 250);
-  Serial.println("The turning desitnation is:");
+  // Serial.println("The turning desitnation is:");
   Serial.print(turning_dest);
-  Serial.println(" But the north is");
+  // Serial.println(" But the north is");
   // delay(250);
   // brake(motor1,motor2);
   find_prox();
@@ -220,7 +250,7 @@ void loop() {
       Serial.print(" cm WEST | ");
   }
     if (driving == true) {
-      if (distance >= 400 || distance <= 25) {// || is like or in python 
+      if (distance >= 400 || distance <= 21) {// || is like or in python 
         Nsafe = false;
         brake(motor1,motor2);
         back(motor1,motor2,150);
@@ -236,32 +266,38 @@ void loop() {
       }
   }
     else {
-    if (distance >= 400 || distance <= 25) {// || is like or in python 
+    if (distance >= 400 || distance <= 21) {// || is like or in python 
       Nsafe = false;
     }
-    if (distance >= 20) {
+    if (distance >= 21) {
       Nsafe = true;
     }
-    if (distanceE >= 400 || distanceE <= 12) {// || is like or in python 
+    if (distanceE >= 400 || distanceE <= EDynaThreshLow) {// || is like or in python 
       Esafe = false;
     }
-    if (distanceE >= 12) {
+    if (distanceE >= EDynaThreshHigh) {
       Esafe = true;
     }
-    if (distanceW >= 400 || distanceW <= 12) {// || is like or in python 
+    if (distanceW >= 400 || distanceW <= WDynaThreshLow) {// || is like or in python 
       Wsafe = false;
     }
-    if (distanceW >= 12) {
+    if (distanceW >= WDynaThreshHigh) {
       Wsafe = true;
     }
     }
   }
   if (just_turned == true) {
     Serial.println("I just turned, so it has to be safe to go North.");
+    forward(motor1,motor2,250);
+    delay(250);
+    if (just_turned == true && distanceE <= 20 && distanceW <= 20) { //if we are driving and the sides are in range of walls
+      dynathresh();
+  } 
     Nsafe = true;
     Wsafe = false;
     Esafe = false;
     just_turned = false;
+    
   }// just turned trumnps everything
   if (Nsafe == false) {
     // motor1.brake();
@@ -274,17 +310,26 @@ void loop() {
 
     if (Wsafe == true && Esafe == false && Nsafe == false) {
       Serial.println("Turn left");
+      delay(500);
+      find_prox();
       turn_left(true, distanceW);
     }
     if (Wsafe == false && Esafe == true  && Nsafe == false) {
       Serial.println("Turn right");
+      delay(500);
+      find_prox();
       turn_right(true, distanceE);
     }
     if (Wsafe == false && Esafe == false && Nsafe == false) {
     Serial.println("dead end"); //berskerk mode
+    // back(motor1, motor2, 150);
+    // delay(2000);
     }
     if (Wsafe == true && Esafe == true && Nsafe == false) {
       Serial.println("fork in the road that I can't yet handle. I can turn left and right.");
+      // back(motor1, motor2, 150);
+      // delay(2000);
+      return;
     }
   }
   if (Nsafe == true && Wsafe == false && Esafe == false) {
@@ -297,8 +342,9 @@ void loop() {
   }
   if (Wsafe == true && Esafe == true && Nsafe == true) {
     Serial.println("Driving north in an open field"); //berskerk mode
+    // forward(motor1, motor2, 250);
   }
-  
+ 
   
 
   // this was for north
@@ -313,11 +359,11 @@ void loop() {
     Serial.print("%, Temp:");
     Serial.print(temp);
     Serial.println(" C | Distances: ");
-  }
+  
 
 
   Serial.println();
   Serial.print("\t\t\t\t\t\t\t\t");
-  
+  }
   
 }
