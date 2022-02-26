@@ -68,8 +68,10 @@ float soundspeedms;
 float soundspeedcm;
 
 int iterations = 6;
-int EDynaThresh = 12;
-int WDynaThresh = 12;
+int EDynaThreshLow = 8;
+int EDynaThreshHigh = 14;
+int WDynaThreshLow = 8;
+int WDynaThreshHigh = 14;
 bool debug_mode = false;
 bool stdf = true; //until proven otherwise
 bool Nsafe = false;
@@ -95,10 +97,12 @@ void dynathresh() {
   and make it drive into the maze, see the ultras change drastically (negativly), then run this calibration. This is a good idea, but the time I have to implement it is short.
   */
   brake(motor1, motor2);
-  delay(5000); // this makes sure it can truly calibrate. 
+  delay(1000); // this makes sure it can truly calibrate. 
   find_prox();
-  EDynaThresh = round(distanceE);
-  WDynaThresh = round(distanceW);
+  EDynaThreshLow = round(distanceE-4);
+  EDynaThreshHigh = round(distanceE+4);
+  WDynaThreshLow = round(distanceW-4);
+  WDynaThreshHigh = round(distanceW+4);
 }
 
 
@@ -114,10 +118,10 @@ void setup() {
     Serial.println();
     Serial.print("DEBUG MODE HAS BEEN ACTIVATED - TURNING OFF MOTORS");
     Serial.println();
-    Serial.print("Establish Edynathresh as");
-    Serial.println(EDynaThresh);
-    Serial.print("Establish WdDynaThresh as");
-    Serial.println(WDynaThresh);
+    // Serial.print("Establish Edynathresh as");
+    // Serial.println(EDynaThresh);
+    // Serial.print("Establish WdDynaThresh as");
+    // Serial.println(WDynaThresh);
     
   } else {
     debug_mode = false;
@@ -267,26 +271,32 @@ void loop() {
     if (distance >= 21) {
       Nsafe = true;
     }
-    if (distanceE >= 400 || distanceE <= EDynaThresh) {// || is like or in python 
+    if (distanceE >= 400 || distanceE <= EDynaThreshLow) {// || is like or in python 
       Esafe = false;
     }
-    if (distanceE >= EDynaThresh) {
+    if (distanceE >= EDynaThreshHigh) {
       Esafe = true;
     }
-    if (distanceW >= 400 || distanceW <= WDynaThresh) {// || is like or in python 
+    if (distanceW >= 400 || distanceW <= WDynaThreshLow) {// || is like or in python 
       Wsafe = false;
     }
-    if (distanceW >= WDynaThresh) {
+    if (distanceW >= WDynaThreshHigh) {
       Wsafe = true;
     }
     }
   }
   if (just_turned == true) {
     Serial.println("I just turned, so it has to be safe to go North.");
+    forward(motor1,motor2,250);
+    delay(250);
+    if (just_turned == true && distanceE <= 20 && distanceW <= 20) { //if we are driving and the sides are in range of walls
+      dynathresh();
+  } 
     Nsafe = true;
     Wsafe = false;
     Esafe = false;
     just_turned = false;
+    
   }// just turned trumnps everything
   if (Nsafe == false) {
     // motor1.brake();
@@ -329,7 +339,7 @@ void loop() {
     Serial.println("Driving north in an open field"); //berskerk mode
     // forward(motor1, motor2, 250);
   }
-  
+ 
   
 
   // this was for north
