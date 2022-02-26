@@ -143,6 +143,7 @@ int sos() {
 void find_prox() {
   /* 
   Runs the proximity checks
+  we can call this function at anytime to improve the accuracy of our time sitatuion.
   */
   sos();
   
@@ -162,13 +163,13 @@ void find_prox() {
 void turn_left(bool first, float distanceW) {
   is_turningL = true;
   if (first==true){
-    Serial.println("Reset turning dest");
+    // Serial.println("Reset turning dest");
     turning_dest = distanceW;
   }
   left(motor1,motor2, 250);
-  Serial.println("The turning desitnation is:");
+  // Serial.println("The turning desitnation is:");
   Serial.print(turning_dest);
-  Serial.println(" But the north is");
+  // Serial.println(" But the north is");
   // delay(250);
   // brake(motor1,motor2);
   find_prox();
@@ -309,10 +310,14 @@ void loop() {
 
     if (Wsafe == true && Esafe == false && Nsafe == false) {
       Serial.println("Turn left");
+      delay(500);
+      find_prox();
       turn_left(true, distanceW);
     }
     if (Wsafe == false && Esafe == true  && Nsafe == false) {
       Serial.println("Turn right");
+      delay(500);
+      find_prox();
       turn_right(true, distanceE);
     }
     if (Wsafe == false && Esafe == false && Nsafe == false) {
