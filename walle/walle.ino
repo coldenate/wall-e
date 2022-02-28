@@ -227,7 +227,7 @@ void loop() {
     turn_left(false, distanceW);
   }    
   if (is_turningR==true){
-    turn_right(false, distanceW);
+    turn_right(false, distanceE);
   }
     
   
