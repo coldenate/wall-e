@@ -18,7 +18,7 @@ Using Ultrasonic sound transmitters, we can gather this information every (appro
 ## Pseudo Logic
 
 ```mermaid
-flowchart LR
+flowchart TD
   subgraph idinit["Chip Init"]
   A[ATmegaChip Init] --> B["void setup()"] 
   B(["void setup()"]) ---  D[Debug_Mode] --> E["Check for button held (3 Seconds window)"]
