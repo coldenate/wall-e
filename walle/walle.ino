@@ -166,7 +166,9 @@ void turn_left(bool first, float distanceW) {
     // Serial.println("Reset turning dest");
     turning_dest = distanceW;
   }
+  delay(100);
   left(motor1,motor2, 250);
+  delay(100);
   // Serial.println("The turning desitnation is:");
   Serial.print(turning_dest);
   // Serial.println(" But the north is");
@@ -174,7 +176,7 @@ void turn_left(bool first, float distanceW) {
   // brake(motor1,motor2);
   find_prox();
   Serial.print(distance);
-  inRange(turning_dest-2, turning_dest+2, distance)? is_turningL = false: is_turningL = true;
+  inRange(turning_dest-1, turning_dest+1, distance)? is_turningL = false: is_turningL = true;
   
   if (is_turningL == true){
     turn_left(false, distanceW);
@@ -195,8 +197,10 @@ void turn_right(bool first, float distanceE) {
   if (first==true){
     Serial.println("Reset turning dest");
     turning_dest = distanceE;
+  delay(100);
   }
   right(motor1,motor2, 250);
+  delay(100);
   Serial.println("The turning desitnation is:");
   Serial.print(turning_dest);
   Serial.println(" But the north is");
