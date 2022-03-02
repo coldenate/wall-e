@@ -17,6 +17,9 @@ Using Ultrasonic sound transmitters, we can gather this information every (appro
 
 ## Pseudo Logic
 
+
+If the flowchart does not render, try using the [GitHub Repository Page](https://github.com/colderinit/wall-e). 
+
 ```mermaid
 flowchart TD
   subgraph idinit["Chip Init"]
