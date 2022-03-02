@@ -96,6 +96,9 @@ void dynathresh() {
   This function will be designed to run at setup. We will need to place it in the maze walls at setup unless we want to advance the function
   and make it drive into the maze, see the ultras change drastically (negativly), then run this calibration. This is a good idea, but the time I have to implement it is short.
   */
+  if (debug_mode==true){
+    return;
+  }
   brake(motor1, motor2);
   delay(1000); // this makes sure it can truly calibrate. 
   find_prox();
@@ -166,13 +169,16 @@ void turn_left(bool first, float distanceW) {
     // Serial.println("Reset turning dest");
     turning_dest = distanceW;
   }
+  delay(100);
   left(motor1,motor2, 250);
+  
+  find_prox();
   // Serial.println("The turning desitnation is:");
   Serial.print(turning_dest);
   // Serial.println(" But the north is");
   // delay(250);
   // brake(motor1,motor2);
-  find_prox();
+  
   Serial.print(distance);
   inRange(turning_dest-2, turning_dest+2, distance)? is_turningL = false: is_turningL = true;
   
@@ -195,14 +201,18 @@ void turn_right(bool first, float distanceE) {
   if (first==true){
     Serial.println("Reset turning dest");
     turning_dest = distanceE;
+  
   }
+  delay(100);
   right(motor1,motor2, 250);
-  Serial.println("The turning desitnation is:");
-  Serial.print(turning_dest);
-  Serial.println(" But the north is");
+ 
+  find_prox();
+  // Serial.println("The turning desitnation is:");
+  // Serial.print(turning_dest);
+  // Serial.println(" But the north is");
   // delay(250);
   // brake(motor1,motor2);
-  find_prox();
+  
   Serial.print(distance);
   inRange(turning_dest-2, turning_dest+2, distance)? is_turningR = false: is_turningR = true;
   
@@ -223,13 +233,13 @@ void turn_right(bool first, float distanceE) {
 
 void loop() {
   find_prox();
-  if (is_turningL==true){
-    turn_left(false, distanceW);
-  }    
-  if (is_turningR==true){
-    turn_right(false, distanceW);
-  }
-    
+  // if (is_turningL==true){
+  //   turn_left(false, distanceW);
+  // }    
+  // if (is_turningR==true){
+  //   turn_right(false, distanceE);
+  // }
+    // possible recursion
   
     
 
@@ -289,7 +299,7 @@ void loop() {
   if (just_turned == true) {
     Serial.println("I just turned, so it has to be safe to go North.");
     forward(motor1,motor2,250);
-    delay(250);
+    delay(1000);
     if (just_turned == true && distanceE <= 20 && distanceW <= 20) { //if we are driving and the sides are in range of walls
       dynathresh();
   } 
@@ -327,6 +337,7 @@ void loop() {
     }
     if (Wsafe == true && Esafe == true && Nsafe == false) {
       Serial.println("fork in the road that I can't yet handle. I can turn left and right.");
+
       // back(motor1, motor2, 150);
       // delay(2000);
       return;
@@ -334,6 +345,9 @@ void loop() {
   }
   if (Nsafe == true && Wsafe == false && Esafe == false) {
     // drive forward
+    if (debug_mode == true){
+  forward(motor1,motor2,250);
+  delay(5000);}
     forward(motor1,motor2,150);
     Serial.println("Drive North"); 
     driving = true;
@@ -342,6 +356,10 @@ void loop() {
   }
   if (Wsafe == true && Esafe == true && Nsafe == true) {
     Serial.println("Driving north in an open field"); //berskerk mode
+    if (debug_mode==true){
+  forward(motor1,motor2,250);
+  delay(5000);
+}
     // forward(motor1, motor2, 250);
   }
  
