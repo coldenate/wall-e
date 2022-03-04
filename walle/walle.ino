@@ -113,8 +113,8 @@ void setup() {
   // put your setup code here, to run once:
   dht.begin();
   pinMode(buttonPin, INPUT);
-  dynathresh();
   buttonState = digitalRead(buttonPin);
+  delay(2000);
   if (buttonState == HIGH) {
     debug_mode = true;    
     Serial.begin(9600);
@@ -127,7 +127,9 @@ void setup() {
     // Serial.println(WDynaThresh);
     
   } else {
-    debug_mode = false;
+    // debug_mode = false;
+    dynathresh(); // the dynamic refresh generator is down here as to not confuse the berserk mode (which needs to ignore all law and life. Berserk mode is like a breakdown recovery, 
+    // you need to forget all your pain, and ram into all your problems.)
   }
   
   
@@ -337,7 +339,9 @@ void loop() {
     }
     if (Wsafe == true && Esafe == true && Nsafe == false) {
       Serial.println("fork in the road that I can't yet handle. I can turn left and right.");
-
+      if (debug_mode == true){
+        forward(motor1,motor2,250);
+        delay(5000);}
       // back(motor1, motor2, 150);
       // delay(2000);
       return;
@@ -346,8 +350,8 @@ void loop() {
   if (Nsafe == true && Wsafe == false && Esafe == false) {
     // drive forward
     if (debug_mode == true){
-  forward(motor1,motor2,250);
-  delay(5000);}
+      forward(motor1,motor2,250);
+      delay(5000);}
     forward(motor1,motor2,150);
     Serial.println("Drive North"); 
     driving = true;
@@ -357,9 +361,9 @@ void loop() {
   if (Wsafe == true && Esafe == true && Nsafe == true) {
     Serial.println("Driving north in an open field"); //berskerk mode
     if (debug_mode==true){
-  forward(motor1,motor2,250);
-  delay(5000);
-}
+    forward(motor1,motor2,250);
+    delay(5000);
+  }
     // forward(motor1, motor2, 250);
   }
  
