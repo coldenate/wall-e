@@ -72,7 +72,8 @@ int EDynaThreshLow = 8;
 int EDynaThreshHigh = 14;
 int WDynaThreshLow = 8;
 int WDynaThreshHigh = 14;
-bool debug_mode = false;
+bool berserk_mode = false;
+bool debug_mode = false; // effects serial output 
 bool stdf = true; //until proven otherwise
 bool Nsafe = false;
 bool Esafe; 
@@ -96,7 +97,7 @@ void dynathresh() {
   This function will be designed to run at setup. We will need to place it in the maze walls at setup unless we want to advance the function
   and make it drive into the maze, see the ultras change drastically (negativly), then run this calibration. This is a good idea, but the time I have to implement it is short.
   */
-  if (debug_mode==true){
+  if (berserk_mode==true){
     return;
   }
   brake(motor1, motor2);
@@ -114,13 +115,12 @@ void setup() {
   dht.begin();
   pinMode(buttonPin, INPUT);
   buttonState = digitalRead(buttonPin);
+  Serial.begin(9600);
+  Serial.print("Hold button for access to non maze mode...");
   delay(2000);
   if (buttonState == HIGH) {
-    debug_mode = true;    
-    Serial.begin(9600);
-    Serial.println();
-    Serial.print("DEBUG MODE HAS BEEN ACTIVATED - TURNING OFF MOTORS");
-    Serial.println();
+    Serial.print("GOING BERSERK");
+    berserk_mode = true;    
     // Serial.print("Establish Edynathresh as");
     // Serial.println(EDynaThresh);
     // Serial.print("Establish WdDynaThresh as");
@@ -339,7 +339,7 @@ void loop() {
     }
     if (Wsafe == true && Esafe == true && Nsafe == false) {
       Serial.println("fork in the road that I can't yet handle. I can turn left and right.");
-      if (debug_mode == true){
+      if (berserk_mode == true){
         forward(motor1,motor2,250);
         delay(5000);}
       // back(motor1, motor2, 150);
@@ -349,7 +349,7 @@ void loop() {
   }
   if (Nsafe == true && Wsafe == false && Esafe == false) {
     // drive forward
-    if (debug_mode == true){
+    if (berserk_mode == true){
       forward(motor1,motor2,250);
       delay(5000);}
     forward(motor1,motor2,150);
@@ -360,9 +360,9 @@ void loop() {
   }
   if (Wsafe == true && Esafe == true && Nsafe == true) {
     Serial.println("Driving north in an open field"); //berskerk mode
-    if (debug_mode==true){
-    forward(motor1,motor2,250);
-    delay(5000);
+    if (berserk_mode==true){
+      forward(motor1,motor2,250);
+      delay(5000);
   }
     // forward(motor1, motor2, 250);
   }
@@ -387,5 +387,9 @@ void loop() {
   Serial.println();
   Serial.print("\t\t\t\t\t\t\t\t");
   }
+  if (buttonState == HIGH) {
+    Serial.print("Debug mode will soon activate.");
+    debug_mode = true;
+  } // at the bottom because it is super not a priority. WE ARE KEEPING OUR "EYES" (SENSORS) ON THE ROAD!!
   
 }
