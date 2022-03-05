@@ -6,7 +6,7 @@
   by Nate Solis
 
   Licensed with MIT License
-  Please do not use this code in an opposing DI situation. :) This is a simple request. If you are Dr. Doofenshmirtz, I cannot do anything about it.
+  Please do not use this code in an opposing Destination Imagination situation. :) This is a simple request. If you are Dr. Doofenshmirtz, I cannot do anything about it.
   Copyright (c) 2022 Nate Solis
 */
 
@@ -67,13 +67,13 @@ float distanceW;
 float soundspeedms;
 float soundspeedcm;
 
-int iterations = 6;
+int iterations = 8;
 int EDynaThreshLow = 8;
 int EDynaThreshHigh = 14;
 int WDynaThreshLow = 8;
 int WDynaThreshHigh = 14;
 bool berserk_mode = false;
-bool debug_mode = false; // effects serial output 
+bool debug_mode = true; // effects serial output 
 bool stdf = true; //until proven otherwise
 bool Nsafe = false;
 bool Esafe; 
@@ -101,7 +101,8 @@ void dynathresh() {
     return;
   }
   brake(motor1, motor2);
-  delay(1000); // this makes sure it can truly calibrate. 
+  delay(1000); // this makes sure it can truly calibrate.
+  Serial.print("Delay in dyna"); 
   find_prox();
   EDynaThreshLow = round(distanceE-4);
   EDynaThreshHigh = round(distanceE+4);
@@ -117,6 +118,7 @@ void setup() {
   buttonState = digitalRead(buttonPin);
   Serial.begin(9600);
   Serial.print("Hold button for access to non maze mode...");
+  Serial.print("Delay in Setup"); 
   delay(2000);
   if (buttonState == HIGH) {
     Serial.print("GOING BERSERK");
@@ -171,26 +173,27 @@ void turn_left(bool first, float distanceW) {
     // Serial.println("Reset turning dest");
     turning_dest = distanceW;
   }
-  delay(100);
+  Serial.print("Delay in turn_left"); 
   left(motor1,motor2, 250);
-  
-  find_prox();
-  // Serial.println("The turning desitnation is:");
+  Serial.println("||");
   Serial.print(turning_dest);
-  // Serial.println(" But the north is");
-  // delay(250);
-  // brake(motor1,motor2);
+  Serial.println("||");
+  Serial.println(" But the north is");
+  delay(250);
+  brake(motor1, motor2);
+  find_prox();
   
   Serial.print(distance);
-  inRange(turning_dest-2, turning_dest+2, distance)? is_turningL = false: is_turningL = true;
-  
+  inRange(turning_dest-0.5, turning_dest+0.5, distance)? is_turningL = false: is_turningL = true;
+  // what we could do is also use the northern side. BUt I don't have time to implement that.
   if (is_turningL == true){
     turn_left(false, distanceW);
     
     }
   if (is_turningL==false){
   brake(motor1,motor2);
-  delay(250);
+  Serial.print("Delay in left"); 
+  delay(200);
   just_turned = true;
   is_turningL = false;  
   Serial.print("WE HAVE TURNED LEFt");
@@ -201,33 +204,36 @@ void turn_left(bool first, float distanceW) {
 void turn_right(bool first, float distanceE) {
   is_turningR = true;
   if (first==true){
-    Serial.println("Reset turning dest");
+    // Serial.println("Reset turning dest");
     turning_dest = distanceE;
   
   }
-  delay(100);
+  Serial.print("Delay in right"); 
   right(motor1,motor2, 250);
- 
+  Serial.println("||");
+  Serial.print(turning_dest);
+  Serial.println("||");
+  Serial.println(" But the north is");
+  delay(200);
+  brake(motor1, motor2);
   find_prox();
-  // Serial.println("The turning desitnation is:");
-  // Serial.print(turning_dest);
-  // Serial.println(" But the north is");
-  // delay(250);
-  // brake(motor1,motor2);
+  delay(500);
+
   
   Serial.print(distance);
-  inRange(turning_dest-2, turning_dest+2, distance)? is_turningR = false: is_turningR = true;
+  inRange(turning_dest-0.5, turning_dest+0.5, distance)? is_turningR = false: is_turningR = true;
   
   if (is_turningR == true){
     turn_right(false, distanceW);
     
     }
   if (is_turningR==false){
-  brake(motor1,motor2);
-  delay(250);
-  just_turned = true;
-  is_turningR = false;
-  Serial.print("WE HAVE TURNED RIGHt");
+    brake(motor1,motor2);
+    Serial.print("Delay in right"); 
+    delay(250);
+    just_turned = true;
+    is_turningR = false;
+    Serial.print("WE HAVE TURNED RIGHt");
   
   
   }
@@ -266,6 +272,7 @@ void loop() {
         Nsafe = false;
         brake(motor1,motor2);
         back(motor1,motor2,150);
+        Serial.print("Delay in drigving == rue"); 
         delay(350);
         brake(motor1,motor2);
 
@@ -299,10 +306,13 @@ void loop() {
     }
   }
   if (just_turned == true) {
+    Serial.println("A");
     Serial.println("I just turned, so it has to be safe to go North.");
     forward(motor1,motor2,250);
-    delay(1000);
+    delay(2000);
+    Serial.print("Delay in jsut turned"); 
     if (just_turned == true && distanceE <= 20 && distanceW <= 20) { //if we are driving and the sides are in range of walls
+      brake(motor1,motor2);
       dynathresh();
   } 
     Nsafe = true;
@@ -323,12 +333,14 @@ void loop() {
     if (Wsafe == true && Esafe == false && Nsafe == false) {
       Serial.println("Turn left");
       delay(500);
+      brake(motor1, motor2);
       find_prox();
       turn_left(true, distanceW);
     }
     if (Wsafe == false && Esafe == true  && Nsafe == false) {
       Serial.println("Turn right");
       delay(500);
+      brake(motor1, motor2);
       find_prox();
       turn_right(true, distanceE);
     }
@@ -344,7 +356,7 @@ void loop() {
         delay(5000);}
       // back(motor1, motor2, 150);
       // delay(2000);
-      return;
+     
     }
   }
   if (Nsafe == true && Wsafe == false && Esafe == false) {
@@ -387,9 +399,9 @@ void loop() {
   Serial.println();
   Serial.print("\t\t\t\t\t\t\t\t");
   }
-  if (buttonState == HIGH) {
-    Serial.print("Debug mode will soon activate.");
-    debug_mode = true;
-  } // at the bottom because it is super not a priority. WE ARE KEEPING OUR "EYES" (SENSORS) ON THE ROAD!!
+  // if (buttonState == HIGH) {
+  //   Serial.print("Debug mode will soon activate.");
+  //   debug_mode = true;
+  // } // at the bottom because it is super not a priority. WE ARE KEEPING OUR "EYES" (SENSORS) ON THE ROAD!!
   
 }
