@@ -317,6 +317,7 @@ void loop() {
     just_turned = false;
     
   }// just turned trumnps everything
+  
   if (Nsafe == false) {
     // motor1.brake();
     // motor2.brake();
