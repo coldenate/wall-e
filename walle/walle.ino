@@ -61,7 +61,10 @@ float distanceW;
 float soundspeedms; //
 float soundspeedcm; // 
 
-int iterations = 7; // amount of times we poke our ultrsonic sensors. ex. if iterations =7 (whats the distance bro,whats the distance bro,whats the distance bro,whats the distance bro,whats the distance bro,whats the distance bro,whats the distance bro,)
+const int iterations = 7; // amount of times we poke our ultrsonic sensors. ex. if iterations =7 (whats the distance bro,whats the distance bro,whats the distance bro,whats the distance bro,whats the distance bro,whats the distance bro,whats the distance bro,)
+
+const float turnBuffer = 1.5;
+
 //default dynamic threshold generations if the threshold generation doesn'texecute
 int EDynaThreshLow = 8;
 int EDynaThreshHigh = 14;
@@ -98,10 +101,68 @@ NewPing sonarW(trigPinWest, echoPinWest, MAX_DISTANCE);
 DHT dht(DHTPIN, DHTYPE);
 
 void dynathresh() {
-  return;
+  if (berserk_mode == true){
+    return;  // for now, We doNOT need threshold generatgion if we are going berserk. This is because this function has shown signs of mapping an imaginary maze for the robot to travel in. 
+
+  }
+  brake (motor1, motor2);
+  find_prox();
+  EDynaThreshLow = round(distanceE-4);
+  EDynaThreshHigh = round(distanceE+4);
+  WDynaThreshLow = round(distanceW-4);
+  WDynaThreshHigh = round(distanceW+4);
 }
 
-void turn(bool initialize, float target, char direction) {return;}
+void turn(bool initialize, bool is_left = false) {
+  if (is_left == true) {
+    is_turningL = true;
+  }
+  if (is_left == false) { // "if we are turning right"
+    is is_turningR = true;
+  }
+  if (initialize == true) {
+    if (is_left==true){turning_dest=distanceW;}
+    if (is_left==false){turning_dest=distanceE;}
+  }
+  while (true){
+    if (is_left==true){
+      left(motor1,motor2,200);
+
+    }
+    if (is_left==false){
+      right(motor1,motor2,200);
+    }
+    //if the codeblock above fails, try moving it out of the while loop, especiallyif the functions go with delays.
+    find_prox();
+    if (is_left==true){
+      inRange(turning_dest-turnBuffer, turning_dest+turnBuffer, distance)? is_turningL = false: is_turningL = true;
+      if (is_turningL == true) {
+        continue;
+      }
+      if (is_turningL == false) {
+        brake(motor1, motor2);
+        just_turned=true;
+        // is_turningL=false;
+        break;
+      }
+    }
+    if (is_left==false){
+      inRange(turning_dest-turnBuffer, turning_dest+turnBuffer, distance)? is_turningR = false: is_turningR = true;
+      if (is_turningR == true) {
+        continue;
+      }
+      if (is_turningR == false) {
+        brake(motor1, motor2);
+        just_turned=true;
+        // is_turningR=false;
+        break;
+      }
+    }
+
+  }
+  // those two statements let us know the direction we are turning in a unified function. The reason we have an extra function is so we can implement our own algorithms for 90 degree turning. 
+
+}
 
 int sos() {
   hum = dht.readHumidity();
@@ -124,8 +185,18 @@ void find_prox() {
   durationE = sonarE.ping_median(iterations);
   durationW = sonarW.ping_median(iterations);
 
-// gathering distance
+  // gathering distance
+  // we dvide by two so we get only one trip of sound.
+  /* 
 
+  T ---------\
+              \
+                >|(Object)
+              /
+  R ---------/
+  We only need a set of lines (path of transmit sound) when dealing with how long it tookf or the sound to just GET to the object. To travel through the air .
+  Beacuse only one of those sets of lines (1/2) represents the actual distance between the transmitter and the object. 
+  */
   distanceN = (durationN / 2) * soundspeedcm;
   distanceE = (durationE / 2) * soundspeedcm;
   distanceW = (durationW / 2) * soundspeedcm;
@@ -214,12 +285,19 @@ void driving_decision() {
 
     if (Wsafe == true && Esafe == false && Nsafe == false) {
 // turn left
+      brake(motor1,motor2);
+      find_prox();
+      turn(true, is_left=true);
     }
     if (Wsafe == false && Esafe == true  && Nsafe == false) {
 // turn right
+      brake(motor1,motor2);
+      find_prox();
+      turn(true, is_left=false);
     }
     if (Wsafe == false && Esafe == false && Nsafe == false) {
 // dead end
+      Serial.println("Dead end"); //not yet coded to handle dead ends. Dead ends may be fired by a miscalculation too.
     }
     if (Wsafe == true && Esafe == true && Nsafe == false) {
       if (berserk_mode == true){
@@ -248,7 +326,7 @@ void driving_decision() {
   }
 }
 
-void setup () {return;}
+void setup () {}
 
 void loop () {
 
