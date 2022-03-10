@@ -6,7 +6,7 @@
   by Nate Solis
 
   Licensed with MIT License
-  Please do not use this code in an opposing DI situation. :) This is a simple request. If you are Dr. Doofenshmirtz, I cannot do anything about it.
+  Please do not use this code in an opposing Destination Imagination situation. :) This is a simple request. If you are Dr. Doofenshmirtz, I cannot do anything about it.
   Copyright (c) 2022 Nate Solis
 */
 
@@ -67,12 +67,13 @@ float distanceW;
 float soundspeedms;
 float soundspeedcm;
 
-int iterations = 7;
+int iterations = 8;
 int EDynaThreshLow = 8;
 int EDynaThreshHigh = 14;
 int WDynaThreshLow = 8;
 int WDynaThreshHigh = 14;
-bool debug_mode = false;
+bool berserk_mode = false;
+bool debug_mode = true; // effects serial output 
 bool stdf = true; //until proven otherwise
 bool Nsafe = false;
 bool Esafe; 
@@ -96,11 +97,12 @@ void dynathresh() {
   This function will be designed to run at setup. We will need to place it in the maze walls at setup unless we want to advance the function
   and make it drive into the maze, see the ultras change drastically (negativly), then run this calibration. This is a good idea, but the time I have to implement it is short.
   */
-  if (debug_mode==true){
+  if (berserk_mode==true){
     return;
   }
   brake(motor1, motor2);
-  delay(1000); // this makes sure it can truly calibrate. 
+  delay(1000); // this makes sure it can truly calibrate.
+  Serial.print("Delay in dyna"); 
   find_prox();
   EDynaThreshLow = round(distanceE-4);
   EDynaThreshHigh = round(distanceE+4);
@@ -113,21 +115,23 @@ void setup() {
   // put your setup code here, to run once:
   dht.begin();
   pinMode(buttonPin, INPUT);
-  dynathresh();
   buttonState = digitalRead(buttonPin);
+  Serial.begin(9600);
+  Serial.print("Hold button for access to non maze mode...");
+  Serial.print("Delay in Setup"); 
+  delay(2000);
   if (buttonState == HIGH) {
-    debug_mode = true;    
-    Serial.begin(9600);
-    Serial.println();
-    Serial.print("DEBUG MODE HAS BEEN ACTIVATED - TURNING OFF MOTORS");
-    Serial.println();
+    Serial.print("GOING BERSERK");
+    berserk_mode = true;    
     // Serial.print("Establish Edynathresh as");
     // Serial.println(EDynaThresh);
     // Serial.print("Establish WdDynaThresh as");
     // Serial.println(WDynaThresh);
     
   } else {
-    debug_mode = false;
+    // debug_mode = false;
+    dynathresh(); // the dynamic refresh generator is down here as to not confuse the berserk mode (which needs to ignore all law and life. Berserk mode is like a breakdown recovery, 
+    // you need to forget all your pain, and ram into all your problems.)
   }
   
   
@@ -169,18 +173,19 @@ void turn_left(bool first, float distanceW) {
     // Serial.println("Reset turning dest");
     turning_dest = distanceW;
   }
-  delay(100);
-  
-  find_prox();
-  // Serial.println("The turning desitnation is:");
+  Serial.print("Delay in turn_left"); 
+  left(motor1,motor2, 250);
+  Serial.println("||");
   Serial.print(turning_dest);
-  // Serial.println(" But the north is");
-  // delay(250);
-  // brake(motor1,motor2);
+  Serial.println("||");
+  Serial.println(" But the north is");
+  delay(250);
+  brake(motor1, motor2);
+  find_prox();
   
   Serial.print(distance);
-  inRange(turning_dest-1.5, turning_dest+1.5, distance)? is_turningL = false: is_turningL = true;
-  
+  inRange(turning_dest-0.5, turning_dest+0.5, distance)? is_turningL = false: is_turningL = true;
+  // what we could do is also use the northern side. BUt I don't have time to implement that.
   if (is_turningL == true){
     left(motor1,motor2, 200);
     turn_left(false, distanceW);
@@ -188,7 +193,8 @@ void turn_left(bool first, float distanceW) {
     }
   if (is_turningL==false){
   brake(motor1,motor2);
-  delay(250);
+  Serial.print("Delay in left"); 
+  delay(200);
   just_turned = true;
   is_turningL = false;  
   Serial.print("WE HAVE TURNED LEFt");
@@ -199,21 +205,24 @@ void turn_left(bool first, float distanceW) {
 void turn_right(bool first, float distanceE) {
   is_turningR = true;
   if (first==true){
-    Serial.println("Reset turning dest");
+    // Serial.println("Reset turning dest");
     turning_dest = distanceE;
   
   }
-  delay(100);
- 
+  Serial.print("Delay in right"); 
+  right(motor1,motor2, 250);
+  Serial.println("||");
+  Serial.print(turning_dest);
+  Serial.println("||");
+  Serial.println(" But the north is");
+  delay(200);
+  brake(motor1, motor2);
   find_prox();
-  // Serial.println("The turning desitnation is:");
-  // Serial.print(turning_dest);
-  // Serial.println(" But the north is");
-  // delay(250);
-  // brake(motor1,motor2);
+  delay(500);
+
   
   Serial.print(distance);
-  inRange(turning_dest-1.5, turning_dest+1.5, distance)? is_turningR = false: is_turningR = true;
+  inRange(turning_dest-0.5, turning_dest+0.5, distance)? is_turningR = false: is_turningR = true;
   
   if (is_turningR == true){
     right(motor1,motor2, 200);
@@ -221,11 +230,12 @@ void turn_right(bool first, float distanceE) {
     
     }
   if (is_turningR==false){
-  brake(motor1,motor2);
-  delay(250);
-  just_turned = true;
-  is_turningR = false;
-  Serial.print("WE HAVE TURNED RIGHt");
+    brake(motor1,motor2);
+    Serial.print("Delay in right"); 
+    delay(250);
+    just_turned = true;
+    is_turningR = false;
+    Serial.print("WE HAVE TURNED RIGHt");
   
   
   }
@@ -263,8 +273,9 @@ void loop() {
       if (distance >= 400 || distance <= 21) {// || is like or in python 
         Nsafe = false;
         brake(motor1,motor2);
-        back(motor1,motor2,80);
-        delay(250);
+        back(motor1,motor2,150);
+        Serial.print("Delay in drigving == rue"); 
+        delay(350);
         brake(motor1,motor2);
 
         Serial.println("Dont drive north");
@@ -297,10 +308,13 @@ void loop() {
     }
   }
   if (just_turned == true) {
+    Serial.println("A");
     Serial.println("I just turned, so it has to be safe to go North.");
     forward(motor1,motor2,250);
-    delay(1000);
+    delay(2000);
+    Serial.print("Delay in jsut turned"); 
     if (just_turned == true && distanceE <= 20 && distanceW <= 20) { //if we are driving and the sides are in range of walls
+      brake(motor1,motor2);
       dynathresh();
   } 
     Nsafe = true;
@@ -321,12 +335,14 @@ void loop() {
     if (Wsafe == true && Esafe == false && Nsafe == false) {
       Serial.println("Turn left");
       delay(500);
+      brake(motor1, motor2);
       find_prox();
       turn_left(true, distanceW);
     }
     if (Wsafe == false && Esafe == true  && Nsafe == false) {
       Serial.println("Turn right");
       delay(500);
+      brake(motor1, motor2);
       find_prox();
       turn_right(true, distanceE);
     }
@@ -337,17 +353,19 @@ void loop() {
     }
     if (Wsafe == true && Esafe == true && Nsafe == false) {
       Serial.println("fork in the road that I can't yet handle. I can turn left and right.");
-
+      if (berserk_mode == true){
+        forward(motor1,motor2,250);
+        delay(5000);}
       // back(motor1, motor2, 150);
       // delay(2000);
-      return;
+     
     }
   }
   if (Nsafe == true && Wsafe == false && Esafe == false) {
     // drive forward
-    if (debug_mode == true){
-  forward(motor1,motor2,250);
-  delay(5000);}
+    if (berserk_mode == true){
+      forward(motor1,motor2,250);
+      delay(5000);}
     forward(motor1,motor2,150);
     Serial.println("Drive North"); 
     driving = true;
@@ -356,10 +374,10 @@ void loop() {
   }
   if (Wsafe == true && Esafe == true && Nsafe == true) {
     Serial.println("Driving north in an open field"); //berskerk mode
-    if (debug_mode==true){
-  forward(motor1,motor2,250);
-  delay(5000);
-}
+    if (berserk_mode==true){
+      forward(motor1,motor2,250);
+      delay(5000);
+  }
     // forward(motor1, motor2, 250);
   }
  
@@ -383,5 +401,9 @@ void loop() {
   Serial.println();
   Serial.print("\t\t\t\t\t\t\t\t");
   }
+  // if (buttonState == HIGH) {
+  //   Serial.print("Debug mode will soon activate.");
+  //   debug_mode = true;
+  // } // at the bottom because it is super not a priority. WE ARE KEEPING OUR "EYES" (SENSORS) ON THE ROAD!!
   
 }
