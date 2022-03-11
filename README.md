@@ -17,7 +17,7 @@ Using Ultrasonic sound transmitters, we can gather this information every (appro
 
 ## Pseudo Logic
 
-See `Flowchart.md`
+See [`Flowchart.md`](Flowchart.md)
 
 ## Why?
 
