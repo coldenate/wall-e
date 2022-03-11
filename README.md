@@ -1,4 +1,4 @@
-# Wall•E Robot!!
+# Ninety-Degree Maze-Solving Robot
 This repository holds the code for a 90° maze-solving robot car. Named after Wall•E because ultrasonic sensors look like the eyes of Wall•E!
 
 # README TODO
@@ -17,7 +17,7 @@ Using Ultrasonic sound transmitters, we can gather this information every (appro
 
 ## Pseudo Logic
 
-If the flowchart does not render, try using the [GitHub Repository Page](https://github.com/colderinit/wall-e). 
+See `Flowchart.md`
 
 ## Why?
 
