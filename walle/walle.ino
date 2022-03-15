@@ -20,9 +20,6 @@
 #define PWMA 9
 #define PWMB 10
 #define STBY 13
-// motor driver offsets
-const int offsetA = 1;
-const int offsetB = 1;
 
 // Temperature Sensor Pin and Type
 
@@ -64,6 +61,15 @@ const int iterations = 7; // amount of times we poke our ultrsonic sensors. ex. 
 
 const float turnBuffer = 1.5;
 
+int whileiter = 0;
+
+// motor driver offsets
+const int offsetA = 1;
+const int offsetB = 1;
+
+// constant speeds
+const int turning_speed = 200;
+
 // default dynamic threshold generations if the threshold generation doesn'texecute
 int EDynaThreshLow = 8;
 int EDynaThreshHigh = 14;
@@ -99,7 +105,7 @@ NewPing sonarE(trigPinEast, echoPinEast, MAX_DISTANCE);
 NewPing sonarW(trigPinWest, echoPinWest, MAX_DISTANCE);
 
 DHT dht(DHTPIN, DHTYPE);
-
+// Function that runs actions necesary to dynamically generate a threshold for maze hallway reconsideration.
 void dynathresh()
 {
   if (berserk_mode == true)
@@ -135,28 +141,39 @@ void turn(bool initialize, bool is_left = false)
       turning_dest = distanceE;
     }
   }
+  whileiter = 0;
   while (true)
   {
-    if (is_left == true)
-    {
-      left(motor1, motor2, 200);
-    }
-    if (is_left == false)
-    {
-      right(motor1, motor2, 200);
-    }
+    
+    Serial.println("while loop iteration:");
+    whileiter = whileiter+1;
+    Serial.print(whileiter);
+    Serial.println("N | DEST");
+    Serial.println(distanceN);        
+    Serial.print(turning_dest);        
     // if the codeblock above fails, try moving it out of the while loop, especiallyif the functions go with delays.
     find_prox();
     if (is_left == true)
     {
-      inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceW) ? is_turningL = false : is_turningL = true;
+      inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turningL = false : is_turningL = true;
       if (is_turningL == true)
       {
-        continue;
+        if (is_left == true)
+          {
+            left(motor1, motor2, turning_speed);
+            Serial.println("Turning left...");
+          }
+        if (is_left == false)
+          {
+            right(motor1, motor2, turning_speed);
+            Serial.println("Turning right...");
+          }
       }
       if (is_turningL == false)
       {
         brake(motor1, motor2);
+        Serial.println("Done turning");
+        delay(2000); // DO NOT INCLUDE IN PRODUCTION
         just_turned = true;
         // is_turningL=false;
         break;
@@ -164,10 +181,19 @@ void turn(bool initialize, bool is_left = false)
     }
     if (is_left == false)
     {
-      inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceE) ? is_turningR = false : is_turningR = true;
+      inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turningR = false : is_turningR = true;
       if (is_turningR == true)
       {
-        continue;
+        if (is_left == true)
+          {
+            left(motor1, motor2, turning_speed);
+            Serial.println("Turning left...");
+          }
+        if (is_left == false)
+          {
+            right(motor1, motor2, turning_speed);
+            Serial.println("Turning right...");
+          }
       }
       if (is_turningR == false)
       {
@@ -234,8 +260,8 @@ void anti_drive()
     { // || is like or in python
       Nsafe = false;
       brake(motor1, motor2);
-      back(motor1, motor2, 80);
-      delay(250);
+      back(motor1, motor2, 120);
+      delay(200);
       brake(motor1, motor2);
       driving = false;
     }
@@ -248,6 +274,7 @@ void anti_drive()
 
 void analyze_surroundings()
 {
+  anti_drive();
   find_prox();
   if (distanceN >= 400 || distanceN <= 21)
   { // || is like or in python
@@ -297,7 +324,7 @@ void driving_decision()
 {
   if (just_turned == true)
   {
-    forward(motor1, motor2, 250);
+    forward(motor1, motor2, 200);
     // delay could be here.
     if (just_turned == true && distanceE <= 20 && distanceW <= 20)
     { // if we are driving and the sides are in range of walls
@@ -336,7 +363,7 @@ void driving_decision()
     {
       if (berserk_mode == true)
       {
-        forward(motor1, motor2, 250);
+        forward(motor1, motor2, 200);
         delay(5000);
       }
     }
@@ -346,10 +373,10 @@ void driving_decision()
     // drive forward
     if (berserk_mode == true)
     {
-      forward(motor1, motor2, 250);
+      forward(motor1, motor2, 200);
       delay(5000);
     }
-    forward(motor1, motor2, 150);
+    forward(motor1, motor2, 200);
     driving = true;
   }
   if (Wsafe == true && Esafe == true && Nsafe == true)
@@ -357,14 +384,32 @@ void driving_decision()
     Serial.println("Driving north in an open field"); // berskerk mode
     if (berserk_mode == true)
     {
-      forward(motor1, motor2, 250);
+      forward(motor1, motor2, 200);
       delay(4000);
     }
   }
 }
 
-void setup() {}
+void setup() {
+  dht.begin();
+  pinMode(buttonPin, INPUT);
+  buttonState = digitalRead(buttonPin);
+  Serial.begin(115200);
+  Serial.print("Hold button for access to non maze mode...");
+  Serial.print("Delay in Setup"); 
+  delay(2000);
+  if (buttonState == HIGH) {
+    Serial.print("GOING BERSERK");
+    berserk_mode = true;        
+  } else {
+    dynathresh(); 
+  }  
+}
 
 void loop()
 {
+  log_data();
+  analyze_surroundings();
+  driving_decision();
+  log_data();
 }
