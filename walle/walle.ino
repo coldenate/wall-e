@@ -27,6 +27,7 @@
 #define DHTYPE DHT11
 
 // Define Ultrasonic Sensor Pins
+
 // West
 #define trigPinWest 3
 #define echoPinWest 3 // they are the same because the script supports a dual-channel type flow for sending and receiving pulses.
@@ -35,16 +36,16 @@
 #define echoPinEast 5
 // North (Prioritized driving direction)
 // North is also in context of the robot, not the actual magnetic fields of earth. Although the script may include a magnetometer.
+
 #define trigPinNorth 6
 #define echoPinNorth 6
 // Button for actiting debug mode
+
 #define buttonPin 4
 
 int buttonState = 0; // a value for the default (OFF) button state | this represents the button NOT completing a circuit flow.
 
 #define MAX_DISTANCE 400 // I AM ON MAXIMUM RENDER DISTANCE, AND I STILL CAN'T FIND WHO ASKED (Max distance to care about in the world of ultrasonic sound)
-
-// dump truck of floats
 
 float durationN;
 float durationE;
@@ -57,7 +58,7 @@ float distanceW;
 float soundspeedms; //
 float soundspeedcm; //
 
-const int iterations = 7; // amount of times we poke our ultrsonic sensors. ex. if iterations =7 (whats the distance bro,whats the distance bro,whats the distance bro,whats the distance bro,whats the distance bro,whats the distance bro,whats the distance bro,)
+const int iterations = 7; // amount of times we poke our ultrsonic sensors. 
 
 const float turnBuffer = 1.5;
 
