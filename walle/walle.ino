@@ -9,6 +9,7 @@
   Please do not use this code in an opposing Destination Imagination situation. :) This is a simple request. If you are Dr. Doofenshmirtz, I cannot do anything about it.
   Copyright (c) 2022 Nate Solis
 */
+
 #include "SparkFun_TB6612.h"
 #include "DHT.h"
 #include "NewPing.h"
@@ -237,7 +238,7 @@ void find_prox()
 
   T ---------\
               \
-                >|(Object)
+                >|     (That line is an Object that the sound wave hits. )
               /
   R ---------/
   We only need a set of lines (path of transmit sound) when dealing with how long it tookf or the sound to just GET to the object. To travel through the air .
