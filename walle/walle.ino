@@ -106,6 +106,12 @@ NewPing sonarN(trigPinNorth, echoPinNorth, MAX_DISTANCE);
 NewPing sonarE(trigPinEast, echoPinEast, MAX_DISTANCE);
 NewPing sonarW(trigPinWest, echoPinWest, MAX_DISTANCE);
 
+unsigned long prevTimeprox = 0;
+unsigned long timeDelayprox = 2;
+
+unsigned long prevTimedrive = 0;
+unsigned long timeDelaydrive = 250;
+
 DHT dht(DHTPIN, DHTYPE);
 // Function that runs actions necesary to dynamically generate a threshold for maze hallway reconsideration.
 void dynathresh()
@@ -115,7 +121,7 @@ void dynathresh()
     return; // for now, We doNOT need threshold generatgion if we are going berserk. This is because this function has shown signs of mapping an imaginary maze for the robot to travel in.
   }
   brake(motor1, motor2);
-  find_prox();
+
   EDynaThreshLow = round(distanceE - 4);
   EDynaThreshHigh = round(distanceE + 4);
   WDynaThreshLow = round(distanceW - 4);
@@ -146,7 +152,7 @@ void turn(bool initialize, bool is_left = false)
   whileiter = 0;
   while (true)
   {
-    
+    find_N();
     Serial.println("while loop iteration:");
     whileiter = whileiter+1;
     Serial.print(whileiter);
@@ -154,7 +160,7 @@ void turn(bool initialize, bool is_left = false)
     Serial.println(distanceN);        
     Serial.print(turning_dest);        
     // if the codeblock above fails, try moving it out of the while loop, especiallyif the functions go with delays.
-    find_prox();
+    
     if (is_left == true)
     {
       inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turningL = false : is_turningL = true;
@@ -249,6 +255,20 @@ void find_prox()
   distanceW = (durationW / 2) * soundspeedcm;
   // end of gatehring distance
 }
+void find_N()
+{
+  /*
+ only gathers northern one
+  */
+  sos();
+
+  durationN = sonarN.ping_median(iterations);
+
+
+  distanceN = (durationN / 2) * soundspeedcm;
+
+
+}
 
 void anti_drive()
 {
@@ -258,7 +278,7 @@ void anti_drive()
 
   if (driving == true)
   {
-    if (distanceN >= 400 || distanceN <= 21)
+    if (distanceN >= 400 || distanceN <= 7)
     { // || is like or in python
       Nsafe = false;
       brake(motor1, motor2);
@@ -277,7 +297,6 @@ void anti_drive()
 void analyze_surroundings()
 {
   anti_drive();
-  find_prox();
   if (distanceN >= 400 || distanceN <= 21)
   { // || is like or in python
     Nsafe = false;
@@ -346,14 +365,14 @@ void driving_decision()
     {
       // turn left
       brake(motor1, motor2);
-      find_prox();
+      
       turn(true, true);
     }
     if (Wsafe == false && Esafe == true && Nsafe == false)
     {
       // turn right
       brake(motor1, motor2);
-      find_prox();
+      
       turn(true, false);
     }
     if (Wsafe == false && Esafe == false && Nsafe == false)
@@ -404,14 +423,25 @@ void setup() {
     Serial.print("GOING BERSERK");
     berserk_mode = true;        
   } else {
+    find_prox();
     dynathresh(); 
   }  
 }
 
 void loop()
 {
+  unsigned long timeCurrent = millis();
+// gather proximities
+  if (timeCurrent - prevTimeprox>timeDelayprox) {
+    prevTimeprox += timeDelayprox;
+    find_prox();
+  }
   log_data();
+  //decide what is safe. 
+
+    
   analyze_surroundings();
   driving_decision();
+  
   log_data();
 }
