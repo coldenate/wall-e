@@ -278,7 +278,7 @@ void anti_drive()
 
   if (driving == true)
   {
-    if (distanceN >= 400 || distanceN <= 7)
+    if (distanceN >= 400 || distanceN <= 10)
     { // || is like or in python
       Nsafe = false;
       brake(motor1, motor2);
