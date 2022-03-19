@@ -8,6 +8,7 @@ This repository holds the code for a 90° maze-solving robot car. Named after Wa
 - [x] Add diagram for logic
 - [ ] Add diagram for wiring
 - [ ] Grammar check
+- [ ] Add cad files and other sources
 - [ ] Make repo public
 
 ## Purpose
@@ -29,10 +30,6 @@ Are you aware your code is rudimentary?
 
 > Yes, I barely have an idea of how to use a keyboard.
 > Jokes aside, I am still a beginner in C++, and I am scared of classes.
-
-What is the total cost if I bought everything as new?
-
-> I am still working that one out. Hold on.
 
 What chip is the hardest to come by?
 
