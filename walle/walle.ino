@@ -110,7 +110,7 @@ unsigned long prevTimeprox = 0;
 unsigned long timeDelayprox = 2;
 
 unsigned long prevTimedrive = 0;
-unsigned long timeDelaydrive = 250;
+unsigned long timeDelaydrive = 4;
 
 DHT dht(DHTPIN, DHTYPE);
 // Function that runs actions necesary to dynamically generate a threshold for maze hallway reconsideration.
@@ -428,6 +428,9 @@ void setup() {
   }  
 }
 
+//last-ditch effort when undergoing a stalemate in terms of completing the maze.
+void should_I_move() {}
+
 void loop()
 {
   unsigned long timeCurrent = millis();
@@ -438,10 +441,13 @@ void loop()
   }
   log_data();
   //decide what is safe. 
+if (timeCurrent - prevTimedrive>timeDelaydrive) {
+    prevTimedrive += timeDelaydrive;
 
-    
-  analyze_surroundings();
-  driving_decision();
   
+  analyze_surroundings();
+  anti_drive();
+  driving_decision();
+}  
   log_data();
 }
