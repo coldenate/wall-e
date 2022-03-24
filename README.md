@@ -1,4 +1,6 @@
+
 # Ninety-Degree Maze-Solving Robot
+
 This repository holds the code for a 90° maze-solving robot car. Named after Wall•E because ultrasonic sensors look like the eyes of Wall•E!
 
 # README TODO
@@ -40,4 +42,5 @@ How do I wire the robot up?
 > I forgot to post that. I will do that soon.
 
 # Legal Jargon
+
 `Copyright (c) 2022 Nate Solis`
