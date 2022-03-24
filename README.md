@@ -35,7 +35,7 @@ Are you aware your code is rudimentary?
 
 What chip is the hardest to come by?
 
-> I would watch out for Motor Drivers. They are sneaky fellows. 
+> I would watch out for Motor Drivers. They are sneaky fellows.
 
 How do I wire the robot up?
 
