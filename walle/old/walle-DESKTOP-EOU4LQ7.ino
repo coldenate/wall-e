@@ -109,9 +109,6 @@ NewPing sonarW(trigPinWest, echoPinWest, MAX_DISTANCE);
 unsigned long prevTimeprox = 0;
 unsigned long timeDelayprox = 2;
 
-unsigned int pingSpeed = 50; // 20 times as second
-unsigned long pingTimer;
-
 unsigned long prevTimedrive = 0;
 unsigned long timeDelaydrive = 4;
 
@@ -229,28 +226,12 @@ int sos()
   return soundspeedcm;
 }
 
-void echoSens() {
-  if (sonarN.check_timer() || sonarE.check_timer() || sonarW.check_timer()) {// add a bunch other){
-    //baals
-    durationN = sonarN.ping_median(iterations);
-    durationE = sonarE.ping_median(iterations);
-    durationW = sonarW.ping_median(iterations);
-
-    distanceN = (durationN / 2) * soundspeedcm;
-    distanceE = (durationE / 2) * soundspeedcm;
-    distanceW = (durationW / 2) * soundspeedcm;
-
-
-
-  }
-}
-
 void find_prox()
 {
   /*
   Runs the proximity checks
   we can call this function at anytime to improve the accuracy of our time sitatuion.
-  */  
+  */
   sos();
 
   durationN = sonarN.ping_median(iterations);
@@ -315,12 +296,12 @@ void anti_drive()
 
 void analyze_surroundings()
 {
-  
-  if (distanceN >= 400 || distanceN <= 7)
+  anti_drive();
+  if (distanceN >= 400 || distanceN <= 21)
   { // || is like or in python
     Nsafe = false;
   }
-  if (distanceN >= 7)
+  if (distanceN >= 21)
   {
     Nsafe = true;
   }
@@ -372,7 +353,7 @@ void driving_decision()
       dynathresh();
     }
     Nsafe = true;
-    Wsafe = false; // this might be problematic
+    Wsafe = false;
     Esafe = false;
     just_turned = false;
   }
@@ -432,7 +413,6 @@ void driving_decision()
 
 void setup() {
   dht.begin();
-  pingTimer = millis();
   pinMode(buttonPin, INPUT);
   buttonState = digitalRead(buttonPin);
   Serial.begin(115200);
@@ -453,25 +433,21 @@ void should_I_move() {}
 
 void loop()
 {
-  // unsigned long timeCurrent = millis();
+  unsigned long timeCurrent = millis();
 // gather proximities
-  if (millis() >= pingTimer){
-    pingTimer += pingSpeed;
-    sonarE.ping_timer(echoSens);
-    sonarW.ping_timer(echoSens);
-    sonarN.ping_timer(echoSens);
-    
+  if (timeCurrent - prevTimeprox>timeDelayprox) {
+    prevTimeprox += timeDelayprox;
+    find_prox();
   }
-  
   log_data();
   //decide what is safe. 
-// if (timeCurrent - prevTimedrive>timeDelaydrive) {
-//     prevTimedrive += timeDelaydrive;
+if (timeCurrent - prevTimedrive>timeDelaydrive) {
+    prevTimedrive += timeDelaydrive;
 
   
   analyze_surroundings();
-  // anti_drive();
+  anti_drive();
   driving_decision();
-// }  
+}  
   log_data();
 }
