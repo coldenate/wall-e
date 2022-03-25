@@ -59,7 +59,7 @@ float distanceW;
 float soundspeedms; //
 float soundspeedcm; //
 
-const int iterations = 7; // amount of times we poke our ultrsonic sensors. 
+const int iterations = 5; // amount of times we poke our ultrsonic sensors. 
 
 const float turnBuffer = 1.5;
 
@@ -109,19 +109,13 @@ NewPing sonarW(trigPinWest, echoPinWest, MAX_DISTANCE);
 unsigned long prevTimeprox = 0;
 unsigned long timeDelayprox = 2;
 
-// unsigned int pingSpeed = 50; // 20 times as second
-// unsigned long pingTimer;
+unsigned int pingSpeed = 35; // 20 times as second
+unsigned long pingTimer;
 
 unsigned long prevTimedrive = 0;
 unsigned long timeDelaydrive = 4;
 
-#define SONAR_NUM     3 // Number or sensors.
-#define MAX_DISTANCE 400 // Maximum distance (in cm) to ping.
-#define PING_INTERVAL 25 // Milliseconds between sensor pings (29ms is about the min to avoid cross-sensor echo).
 
-unsigned long pingTimer[SONAR_NUM]; // Holds the times when the next ping should happen for each sensor.
-unsigned int cm[SONAR_NUM];         // Where the ping distances are stored.
-uint8_t currentSensor = 0;   
 
 
 DHT dht(DHTPIN, DHTYPE);
@@ -229,8 +223,7 @@ void turn(bool initialize, bool is_left = false)
 
 int sos()
 {
-  hum = dht.readHumidity();
-  temp = dht.readTemperature();
+  
 
   soundspeedms = 331.4 + (0.606 * temp) + (0.0124 * hum);
 
@@ -238,21 +231,7 @@ int sos()
   return soundspeedcm;
 }
 
-void echoSens() {
-  if (sonarN.check_timer() || sonarE.check_timer() || sonarW.check_timer()) {// add a bunch other){
-    //baals
-    durationN = sonarN.ping();
-    durationE = sonarE.ping();
-    durationW = sonarW.ping();
 
-    distanceN = (durationN / 2) * soundspeedcm;
-    distanceE = (durationE / 2) * soundspeedcm;
-    distanceW = (durationW / 2) * soundspeedcm;
-
-
-
-  }
-}
 
 void find_prox()
 {
@@ -311,7 +290,7 @@ void anti_drive()
       Nsafe = false;
       brake(motor1, motor2);
       back(motor1, motor2, 120);
-      delay(200);
+      delay(500);
       brake(motor1, motor2);
       driving = false;
     }
@@ -349,6 +328,9 @@ void analyze_surroundings()
   {
     Wsafe = true;
   }
+  // Serial.println(Nsafe);
+  // Serial.println(Esafe);
+  // Serial.println(Wsafe);
 }
 
 void log_data()
@@ -454,7 +436,9 @@ void setup() {
   } else {
     find_prox();
     dynathresh(); 
-  }  
+  }
+  hum = dht.readHumidity();
+  temp = dht.readTemperature();
 }
 
 //last-ditch effort when undergoing a stalemate in terms of completing the maze.
@@ -464,12 +448,12 @@ void loop()
 {
   // unsigned long timeCurrent = millis();
 // gather proximities
-  if (millis() >= pingTimer){
-    pingTimer += pingSpeed;
-    sonarE.ping_timer(echoSens);
-    sonarW.ping_timer(echoSens);
-    sonarN.ping_timer(echoSens);
-    
+  unsigned long timeCurrent = millis();
+  // unsigned long timeCurrent = millis();
+// gather proximities
+  if (timeCurrent - prevTimeprox>timeDelayprox) {
+    prevTimeprox += timeDelayprox;
+    find_prox();
   }
   analyze_surroundings();
   driving_decision();
