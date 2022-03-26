@@ -59,9 +59,9 @@ float distanceW;
 float soundspeedms; //
 float soundspeedcm; //
 
-const int iterations = 7; // amount of times we poke our ultrsonic sensors. 
+const int iterations = 5; // amount of times we poke our ultrsonic sensors. 
 
-const float turnBuffer = 0.5;
+const float turnBuffer = 1.5;
 
 int whileiter = 0;
 
@@ -70,10 +70,7 @@ const int offsetA = 1;
 const int offsetB = 1;
 
 // constant speeds
-const int turning_speed = 120;
-const int default_speed = 120;
-const int secondary_speed = 70;
-//universal speed control of the motor groups 
+const int turning_speed = 155;
 
 // default dynamic threshold generations if the threshold generation doesn'texecute
 int EDynaThreshLow = 8;
@@ -163,7 +160,7 @@ void turn(bool initialize, bool is_left = false)
   {
     find_N();
     Serial.println("while loop iteration:");
-    whileiter = whileiter+1; 
+    whileiter = whileiter+1;
     Serial.print(whileiter);
     Serial.println("N | DEST");
     Serial.println(distanceN);        
@@ -172,12 +169,7 @@ void turn(bool initialize, bool is_left = false)
     
     if (is_left == true)
     {
-      if (distanceN > 5) {
-        is_turningL = true;
-      }
-      else {
       inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turningL = false : is_turningL = true;
-      }
       if (is_turningL == true)
       {
         if (is_left == true)
@@ -203,12 +195,7 @@ void turn(bool initialize, bool is_left = false)
     }
     if (is_left == false)
     {
-      if (distanceN > 5) {
-        is_turningR = true;
-      }
-      else {
       inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turningR = false : is_turningR = true;
-      }
       if (is_turningR == true)
       {
         if (is_left == true)
@@ -282,7 +269,7 @@ void find_N()
   */
   sos();
 
-  durationN = sonarN.ping_median(7);
+  durationN = sonarN.ping_median(iterations);
 
 
   distanceN = (durationN / 2) * soundspeedcm;
@@ -298,12 +285,12 @@ void anti_drive()
 
   if (driving == true)
   {
-    if (distanceN >= 400 || distanceN <= 5)
+    if (distanceN >= 400 || distanceN <= 13)
     { // || is like or in python
       Nsafe = false;
       brake(motor1, motor2);
-      back(motor1, motor2, secondary_speed);
-      delay(600);
+      back(motor1, motor2, 120);
+      delay(500);
       brake(motor1, motor2);
       driving = false;
     }
@@ -368,7 +355,7 @@ void driving_decision()
 {
   if (just_turned == true)
   {
-    forward(motor1, motor2, default_speed);
+    forward(motor1, motor2, 200);
     // delay could be here.
     if (just_turned == true && distanceE <= 20 && distanceW <= 20)
     { // if we are driving and the sides are in range of walls
@@ -401,16 +388,13 @@ void driving_decision()
     if (Wsafe == false && Esafe == false && Nsafe == false)
     {
       // dead end
-
       Serial.println("Dead end"); // not yet coded to handle dead ends. Dead ends may be fired by a miscalculation too.
-      
-      maybe_I_move(); 
     }
     if (Wsafe == true && Esafe == true && Nsafe == false)
     {
       if (berserk_mode == true)
       {
-        forward(motor1, motor2, default_speed);
+        forward(motor1, motor2, 200);
         delay(5000);
       }
     }
@@ -420,22 +404,21 @@ void driving_decision()
     // drive forward
     if (berserk_mode == true)
     {
-      forward(motor1, motor2, default_speed);
+      forward(motor1, motor2, 200);
       delay(5000);
     }
-    forward(motor1, motor2, default_speed);
+    forward(motor1, motor2, 125);
     driving = true;
   }
   if (Wsafe == true && Esafe == true && Nsafe == true)
   {
-    Serial.println("Driving north in an open field attempting to turn.."); 
-    maybe_I_move(); 
-    // berskerk mode
+    Serial.println("Driving north in an open field"); // berskerk mode
     if (berserk_mode == true)
     {
-      forward(motor1, motor2, default_speed);
+      forward(motor1, motor2, 200);
       delay(4000);
     }
+    maybe_I_move();
   }
 }
 
