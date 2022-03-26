@@ -61,7 +61,7 @@ float soundspeedcm; //
 
 const int iterations = 5; // amount of times we poke our ultrsonic sensors. 
 
-const float turnBuffer = 1.5;
+const float turnBuffer = 0.75;
 
 int whileiter = 0;
 
@@ -70,7 +70,10 @@ const int offsetA = 1;
 const int offsetB = 1;
 
 // constant speeds
-const int turning_speed = 200;
+const int turning_speed = 125;
+const int default_speed = 120;
+const int secondary_speed = 70;
+//universal speed control of the motor groups 
 
 // default dynamic threshold generations if the threshold generation doesn'texecute
 int EDynaThreshLow = 8;
@@ -160,7 +163,7 @@ void turn(bool initialize, bool is_left = false)
   {
     find_N();
     Serial.println("while loop iteration:");
-    whileiter = whileiter+1;
+    whileiter = whileiter+1; 
     Serial.print(whileiter);
     Serial.println("N | DEST");
     Serial.println(distanceN);        
@@ -269,7 +272,7 @@ void find_N()
   */
   sos();
 
-  durationN = sonarN.ping_median(iterations);
+  durationN = sonarN.ping_median(7);
 
 
   distanceN = (durationN / 2) * soundspeedcm;
@@ -289,8 +292,8 @@ void anti_drive()
     { // || is like or in python
       Nsafe = false;
       brake(motor1, motor2);
-      back(motor1, motor2, 120);
-      delay(500);
+      back(motor1, motor2, secondary_speed);
+      delay(450);
       brake(motor1, motor2);
       driving = false;
     }
@@ -355,7 +358,7 @@ void driving_decision()
 {
   if (just_turned == true)
   {
-    forward(motor1, motor2, 200);
+    forward(motor1, motor2, default_speed);
     // delay could be here.
     if (just_turned == true && distanceE <= 20 && distanceW <= 20)
     { // if we are driving and the sides are in range of walls
@@ -388,13 +391,16 @@ void driving_decision()
     if (Wsafe == false && Esafe == false && Nsafe == false)
     {
       // dead end
+
       Serial.println("Dead end"); // not yet coded to handle dead ends. Dead ends may be fired by a miscalculation too.
+      
+      maybe_I_move(); 
     }
     if (Wsafe == true && Esafe == true && Nsafe == false)
     {
       if (berserk_mode == true)
       {
-        forward(motor1, motor2, 200);
+        forward(motor1, motor2, default_speed);
         delay(5000);
       }
     }
@@ -404,18 +410,20 @@ void driving_decision()
     // drive forward
     if (berserk_mode == true)
     {
-      forward(motor1, motor2, 200);
+      forward(motor1, motor2, default_speed);
       delay(5000);
     }
-    forward(motor1, motor2, 200);
+    forward(motor1, motor2, default_speed);
     driving = true;
   }
   if (Wsafe == true && Esafe == true && Nsafe == true)
   {
-    Serial.println("Driving north in an open field"); // berskerk mode
+    Serial.println("Driving north in an open field attempting to turn.."); 
+    maybe_I_move(); 
+    // berskerk mode
     if (berserk_mode == true)
     {
-      forward(motor1, motor2, 200);
+      forward(motor1, motor2, default_speed);
       delay(4000);
     }
   }
@@ -442,7 +450,16 @@ void setup() {
 }
 
 //last-ditch effort when undergoing a stalemate in terms of completing the maze.
-void should_I_move() {}
+void maybe_I_move() {
+  if (distanceN <= 15){
+    if (distanceE > distanceW){ // turn east
+      turn(false, true);
+    }
+    if (distanceE < distanceW) { // turn west
+      turn(true, true);
+    }
+  } // generaly confirming if we see a dead end
+}
 
 void loop()
 {
