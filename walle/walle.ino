@@ -59,9 +59,9 @@ float distanceW;
 float soundspeedms; //
 float soundspeedcm; //
 
-const int iterations = 5; // amount of times we poke our ultrsonic sensors. 
+const int iterations = 7; // amount of times we poke our ultrsonic sensors. 
 
-const float turnBuffer = 0.75;
+const float turnBuffer = 0.5;
 
 int whileiter = 0;
 
@@ -70,7 +70,7 @@ const int offsetA = 1;
 const int offsetB = 1;
 
 // constant speeds
-const int turning_speed = 125;
+const int turning_speed = 120;
 const int default_speed = 120;
 const int secondary_speed = 70;
 //universal speed control of the motor groups 
@@ -172,7 +172,12 @@ void turn(bool initialize, bool is_left = false)
     
     if (is_left == true)
     {
+      if (distanceN > 5) {
+        is_turningL = true;
+      }
+      else {
       inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turningL = false : is_turningL = true;
+      }
       if (is_turningL == true)
       {
         if (is_left == true)
@@ -198,7 +203,12 @@ void turn(bool initialize, bool is_left = false)
     }
     if (is_left == false)
     {
+      if (distanceN > 5) {
+        is_turningR = true;
+      }
+      else {
       inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turningR = false : is_turningR = true;
+      }
       if (is_turningR == true)
       {
         if (is_left == true)
@@ -288,12 +298,12 @@ void anti_drive()
 
   if (driving == true)
   {
-    if (distanceN >= 400 || distanceN <= 10)
+    if (distanceN >= 400 || distanceN <= 5)
     { // || is like or in python
       Nsafe = false;
       brake(motor1, motor2);
       back(motor1, motor2, secondary_speed);
-      delay(450);
+      delay(600);
       brake(motor1, motor2);
       driving = false;
     }
@@ -452,10 +462,10 @@ void setup() {
 //last-ditch effort when undergoing a stalemate in terms of completing the maze.
 void maybe_I_move() {
   if (distanceN <= 15){
-    if (distanceE > distanceW){ // turn east
+    if (distanceE > distanceW+3){ // turn east
       turn(false, true);
     }
-    if (distanceE < distanceW) { // turn west
+    if (distanceE < distanceW+3) { // turn west
       turn(true, true);
     }
   } // generaly confirming if we see a dead end
