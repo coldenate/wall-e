@@ -9,6 +9,7 @@
   Please do not use this code in an opposing Destination Imagination situation. :) This is a simple request. If you are Dr. Doofenshmirtz, I cannot do anything about it.
   Copyright (c) 2022 Nate Solis
 */
+
 #include "SparkFun_TB6612.h"
 #include "DHT.h"
 #include "NewPing.h"
@@ -58,7 +59,7 @@ float distanceW;
 float soundspeedms; //
 float soundspeedcm; //
 
-const int iterations = 7; // amount of times we poke our ultrsonic sensors. 
+const int iterations = 5; // amount of times we poke our ultrsonic sensors. 
 
 const float turnBuffer = 1.5;
 
@@ -69,7 +70,7 @@ const int offsetA = 1;
 const int offsetB = 1;
 
 // constant speeds
-const int turning_speed = 200;
+const int turning_speed = 155;
 
 // default dynamic threshold generations if the threshold generation doesn'texecute
 int EDynaThreshLow = 8;
@@ -105,6 +106,18 @@ NewPing sonarN(trigPinNorth, echoPinNorth, MAX_DISTANCE);
 NewPing sonarE(trigPinEast, echoPinEast, MAX_DISTANCE);
 NewPing sonarW(trigPinWest, echoPinWest, MAX_DISTANCE);
 
+unsigned long prevTimeprox = 0;
+unsigned long timeDelayprox = 2;
+
+unsigned int pingSpeed = 35; // 20 times as second
+unsigned long pingTimer;
+
+unsigned long prevTimedrive = 0;
+unsigned long timeDelaydrive = 4;
+
+
+
+
 DHT dht(DHTPIN, DHTYPE);
 // Function that runs actions necesary to dynamically generate a threshold for maze hallway reconsideration.
 void dynathresh()
@@ -114,7 +127,7 @@ void dynathresh()
     return; // for now, We doNOT need threshold generatgion if we are going berserk. This is because this function has shown signs of mapping an imaginary maze for the robot to travel in.
   }
   brake(motor1, motor2);
-  find_prox();
+
   EDynaThreshLow = round(distanceE - 4);
   EDynaThreshHigh = round(distanceE + 4);
   WDynaThreshLow = round(distanceW - 4);
@@ -145,7 +158,7 @@ void turn(bool initialize, bool is_left = false)
   whileiter = 0;
   while (true)
   {
-    
+    find_N();
     Serial.println("while loop iteration:");
     whileiter = whileiter+1;
     Serial.print(whileiter);
@@ -153,7 +166,7 @@ void turn(bool initialize, bool is_left = false)
     Serial.println(distanceN);        
     Serial.print(turning_dest);        
     // if the codeblock above fails, try moving it out of the while loop, especiallyif the functions go with delays.
-    find_prox();
+    
     if (is_left == true)
     {
       inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turningL = false : is_turningL = true;
@@ -210,8 +223,7 @@ void turn(bool initialize, bool is_left = false)
 
 int sos()
 {
-  hum = dht.readHumidity();
-  temp = dht.readTemperature();
+  
 
   soundspeedms = 331.4 + (0.606 * temp) + (0.0124 * hum);
 
@@ -219,12 +231,14 @@ int sos()
   return soundspeedcm;
 }
 
+
+
 void find_prox()
 {
   /*
   Runs the proximity checks
   we can call this function at anytime to improve the accuracy of our time sitatuion.
-  */
+  */  
   sos();
 
   durationN = sonarN.ping_median(iterations);
@@ -237,7 +251,7 @@ void find_prox()
 
   T ---------\
               \
-                >|(Object)
+                >|     (That line is an Object that the sound wave hits. )
               /
   R ---------/
   We only need a set of lines (path of transmit sound) when dealing with how long it tookf or the sound to just GET to the object. To travel through the air .
@@ -248,6 +262,20 @@ void find_prox()
   distanceW = (durationW / 2) * soundspeedcm;
   // end of gatehring distance
 }
+void find_N()
+{
+  /*
+ only gathers northern one
+  */
+  sos();
+
+  durationN = sonarN.ping_median(iterations);
+
+
+  distanceN = (durationN / 2) * soundspeedcm;
+
+
+}
 
 void anti_drive()
 {
@@ -257,12 +285,12 @@ void anti_drive()
 
   if (driving == true)
   {
-    if (distanceN >= 400 || distanceN <= 21)
+    if (distanceN >= 400 || distanceN <= 13)
     { // || is like or in python
       Nsafe = false;
       brake(motor1, motor2);
       back(motor1, motor2, 120);
-      delay(200);
+      delay(500);
       brake(motor1, motor2);
       driving = false;
     }
@@ -275,13 +303,12 @@ void anti_drive()
 
 void analyze_surroundings()
 {
-  anti_drive();
-  find_prox();
-  if (distanceN >= 400 || distanceN <= 21)
+  
+  if (distanceN >= 400 || distanceN <= 7)
   { // || is like or in python
     Nsafe = false;
   }
-  if (distanceN >= 21)
+  if (distanceN >= 7)
   {
     Nsafe = true;
   }
@@ -301,6 +328,9 @@ void analyze_surroundings()
   {
     Wsafe = true;
   }
+  // Serial.println(Nsafe);
+  // Serial.println(Esafe);
+  // Serial.println(Wsafe);
 }
 
 void log_data()
@@ -333,7 +363,7 @@ void driving_decision()
       dynathresh();
     }
     Nsafe = true;
-    Wsafe = false;
+    Wsafe = false; // this might be problematic
     Esafe = false;
     just_turned = false;
   }
@@ -345,14 +375,14 @@ void driving_decision()
     {
       // turn left
       brake(motor1, motor2);
-      find_prox();
+      
       turn(true, true);
     }
     if (Wsafe == false && Esafe == true && Nsafe == false)
     {
       // turn right
       brake(motor1, motor2);
-      find_prox();
+      
       turn(true, false);
     }
     if (Wsafe == false && Esafe == false && Nsafe == false)
@@ -377,7 +407,7 @@ void driving_decision()
       forward(motor1, motor2, 200);
       delay(5000);
     }
-    forward(motor1, motor2, 200);
+    forward(motor1, motor2, 125);
     driving = true;
   }
   if (Wsafe == true && Esafe == true && Nsafe == true)
@@ -388,14 +418,16 @@ void driving_decision()
       forward(motor1, motor2, 200);
       delay(4000);
     }
+    maybe_I_move();
   }
 }
 
 void setup() {
+  Serial.begin(115200);
   dht.begin();
+  pingTimer = millis();
   pinMode(buttonPin, INPUT);
   buttonState = digitalRead(buttonPin);
-  Serial.begin(115200);
   Serial.print("Hold button for access to non maze mode...");
   Serial.print("Delay in Setup"); 
   delay(2000);
@@ -403,13 +435,36 @@ void setup() {
     Serial.print("GOING BERSERK");
     berserk_mode = true;        
   } else {
+    find_prox();
     dynathresh(); 
-  }  
+  }
+  hum = dht.readHumidity();
+  temp = dht.readTemperature();
+}
+
+//last-ditch effort when undergoing a stalemate in terms of completing the maze.
+void maybe_I_move() {
+  if (distanceN <= 15){
+    if (distanceE > distanceW+3){ // turn east
+      turn(false, true);
+    }
+    if (distanceE < distanceW+3) { // turn west
+      turn(true, true);
+    }
+  } // generaly confirming if we see a dead end
 }
 
 void loop()
 {
-  log_data();
+  // unsigned long timeCurrent = millis();
+// gather proximities
+  unsigned long timeCurrent = millis();
+  // unsigned long timeCurrent = millis();
+// gather proximities
+  if (timeCurrent - prevTimeprox>timeDelayprox) {
+    prevTimeprox += timeDelayprox;
+    find_prox();
+  }
   analyze_surroundings();
   driving_decision();
   log_data();
