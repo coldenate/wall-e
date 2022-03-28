@@ -1,7 +1,7 @@
 # Prerequisites
 *.d
-
-Autogen
+node_modules/
+# Autogen
 .vscode/
 
 # Compiled Object files
