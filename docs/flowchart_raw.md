@@ -1,6 +1,6 @@
 # Arduino Script Logic Flowchart
 
-<!-- y -->
+
 
 ```mermaid
 flowchart TD
