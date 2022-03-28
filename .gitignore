@@ -3,7 +3,7 @@
 node_modules/
 # Autogen
 .vscode/
-
+package-lock.json
 # Compiled Object files
 *.slo
 *.lo
