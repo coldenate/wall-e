@@ -47,8 +47,8 @@ jobs:
         
       - name: Save SVG to documentation folder
         run: |
-          git add .
           git rm -r node_modules/ 
+          git add . 
           git commit -m "Exported flowchart changes to svg."
           git push
 
