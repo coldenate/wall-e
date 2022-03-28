@@ -40,7 +40,7 @@ jobs:
         
       - name: Save SVG to documentation folder
         run: |
-          git add docs/
+          git add "docs/"
           git commit -m "Exported flowchart changes to svg.
           git push
 
