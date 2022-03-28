@@ -6,7 +6,7 @@ name: Mermaid Export
 on:
   push:
     paths:
-      - 'docs/flowchart_raw.md'
+      - 'flowchart_raw.md'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
           
       
       - name: Export to SVG
-        run: ./node_modules/.bin/mmdc -i docs/flowchart_raw.md -o ./flowchart.md
+        run: ./node_modules/.bin/mmdc -i flowchart_raw.md -o flowchart.md
         
       - name: setup git config
         run: |
