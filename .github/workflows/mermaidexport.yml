@@ -38,7 +38,7 @@ jobs:
           
       
       - name: Export to SVG
-        run: ./node_modules/.bin/mmdc -i docs/flowchart_raw.md -o docs/flowchart.md
+        run: ./node_modules/.bin/mmdc -i docs/flowchart_raw.md -o flowchart.md
         
       - name: setup git config
         run: |
