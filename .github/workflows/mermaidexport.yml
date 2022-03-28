@@ -33,10 +33,10 @@ jobs:
       - name: Install Dependencies
         run: |
           npm install @mermaid-js/mermaid-cli 
-          ./node_modules/.bin/mmdc -h
+          
       
       - name: Export to SVG
-        run: mmdc -i flowchart.md -o output.svg
+        run: ./node_modules/.bin/mmdc -i flowchart.md -o output.svg
         
       - name: Save SVG to documentation folder
         run: |
