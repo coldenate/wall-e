@@ -1,3 +1,5 @@
+# The Source Code Logic Flowchart
+
 ```mermaid
 flowchart TD
   subgraph idinit["Chip Init"]
