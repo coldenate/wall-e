@@ -1,31 +1,18 @@
-#include "DHT.h";
+#define buttonPin 4
 
-#define DHTPIN 7
-#define DHTYPE DHT11
-
-DHT dht(DHTPIN, DHTYPE);
-
-float hum;
-float temp;
-
-
+int buttonState = 0; // a value for the default (OFF) button state | this represents the button NOT completing a circuit flow.
 
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
-  dht.begin();
+  Serial.begin(9600);  
+  pinMode(buttonPin, INPUT);
+  buttonState = digitalRead(buttonPin);
+
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  delay(2000); 
-  hum = dht.readHumidity();
-  temp = dht.readTemperature();
-
-  Serial.print("Humidity: ");
-  Serial.print(hum);
-  Serial.print(" %, Temp: ");
-  Serial.print(temp);
-  Serial.println(" Celsius");
+  if (buttonState == HIGH) {
+    Serial.print("GOING BERSERK");}
 }
