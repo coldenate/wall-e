@@ -1,4 +1,4 @@
-# The Source Code Logic Flowchart
+# Arduino Script Logic Flowchart
 
 ```mermaid
 flowchart TD
