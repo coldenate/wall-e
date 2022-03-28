@@ -69,18 +69,22 @@ int whileiter = 0;
 const int offsetA = 1;
 const int offsetB = 1;
 
+
 // constant speeds
 const int turning_speed = 155;
 
 // default dynamic threshold generations if the threshold generation doesn'texecute
+
 int EDynaThreshLow = 8;
 int EDynaThreshHigh = 14;
 int WDynaThreshLow = 8;
 int WDynaThreshHigh = 14;
+
 // decision tree manuplation
 bool berserk_mode = false;
 bool debug_mode = true; // effects serial output
 bool stdf = true;       // until proven otherwise
+
 bool Nsafe = false;
 bool Esafe;
 bool Wsafe;
@@ -101,6 +105,7 @@ Motor motor1 = Motor(AIN1, AIN2, PWMA, offsetA, STBY);
 Motor motor2 = Motor(BIN1, BIN2, PWMB, offsetB, STBY);
 
 // Newping Library Object Declarations
+
 
 NewPing sonarN(trigPinNorth, echoPinNorth, MAX_DISTANCE);
 NewPing sonarE(trigPinEast, echoPinEast, MAX_DISTANCE);
@@ -133,6 +138,7 @@ void dynathresh()
   WDynaThreshLow = round(distanceW - 4);
   WDynaThreshHigh = round(distanceW + 4);
 }
+
 
 void turn(bool initialize, bool is_left = false)
 {
@@ -217,6 +223,7 @@ void turn(bool initialize, bool is_left = false)
         break;
       }
     }
+
   }
   // those two statements let us know the direction we are turning in a unified function. The reason we have an extra function is so we can implement our own algorithms for 90 degree turning.
 }
@@ -269,10 +276,12 @@ void find_N()
   */
   sos();
 
+
   durationN = sonarN.ping_median(iterations);
 
 
   distanceN = (durationN / 2) * soundspeedcm;
+
 
 
 }
@@ -299,6 +308,7 @@ void anti_drive()
       Nsafe = true;
     }
   }
+
 }
 
 void analyze_surroundings()
@@ -310,6 +320,7 @@ void analyze_surroundings()
   }
   if (distanceN >= 7)
   {
+
     Nsafe = true;
   }
   if (distanceE >= 400 || distanceE <= EDynaThreshLow)
@@ -351,6 +362,7 @@ void log_data()
   Serial.print(" cm WEST | ");
 }
 
+
 void driving_decision()
 {
   if (just_turned == true)
@@ -377,6 +389,7 @@ void driving_decision()
       brake(motor1, motor2);
       
       turn(true, true);
+
     }
     if (Wsafe == false && Esafe == true && Nsafe == false)
     {
@@ -385,6 +398,7 @@ void driving_decision()
       
       turn(true, false);
     }
+
     if (Wsafe == false && Esafe == false && Nsafe == false)
     {
       // dead end
@@ -397,19 +411,23 @@ void driving_decision()
         forward(motor1, motor2, 200);
         delay(5000);
       }
+
     }
   }
   if (Nsafe == true && Wsafe == false && Esafe == false)
   {
     // drive forward
+
     if (berserk_mode == true)
     {
       forward(motor1, motor2, 200);
       delay(5000);
     }
     forward(motor1, motor2, 125);
+
     driving = true;
   }
+
   if (Wsafe == true && Esafe == true && Nsafe == true)
   {
     Serial.println("Driving north in an open field"); // berskerk mode
@@ -419,6 +437,7 @@ void driving_decision()
       delay(4000);
     }
     maybe_I_move();
+
   }
 }
 
@@ -465,7 +484,9 @@ void loop()
     prevTimeprox += timeDelayprox;
     find_prox();
   }
+
   analyze_surroundings();
   driving_decision();
   log_data();
+
 }
