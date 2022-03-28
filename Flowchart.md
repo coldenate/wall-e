@@ -1,6 +1,3 @@
-
-# Flowchart
-
 ```mermaid
 flowchart TD
   subgraph idinit["Chip Init"]
@@ -66,24 +63,4 @@ flowchart TD
   end
   id4 --> idloop
   end
-```
-
-Flowchart is newer than the code below.
-
-```cpp
-// Note : This logic is really old. Flowchart is newww.
-Setup - Set correct pins
-Setup - Get Temperature Once. Only once per initialization.
-Setup - calibrate motors after a few seconds.
-Setup - Define functions that allow for clean turning direction.
-
-Loop - Begin pings
-Loop - Make true/false safety statements flow
-  in the loop - constantly getting speed of sound
-  Gets distance of all four directions (Maybe a key:pair)
-  If statement governs safety with proximity threshold 
-  [Direction of which the robot came from should be ignored. Or not considered usable unless I add enough complexity to allow for more complex mazes.
-  Return safety to go forward, or return a command to turn left or right.
-Loop - answer t/f with either driving forward or not | or run the turn funcs
-Loop - prioritize driving forward (north in terms of the robot's chassis)
 ```
