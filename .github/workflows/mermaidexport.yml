@@ -40,6 +40,11 @@ jobs:
       - name: Export to SVG
         run: ./node_modules/.bin/mmdc -i docs/flowchart.md -o output.svg
         
+      - name: setup git config
+        run: |
+          git config user.name "GitHub Actions: export to svg "
+          git config user.email "<>"
+        
       - name: Save SVG to documentation folder
         run: |
           git add docs/
