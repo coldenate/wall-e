@@ -1,4 +1,4 @@
 {
-    "board": "arduino:avr:uno",
-    "sketch": "walle\\walle.ino"
+    "sketch": "walle\\walle.ino",
+    "board": "arduino:avr:uno"
 }
