@@ -3,13 +3,13 @@
 
   This sketch contains the on-board decision making for the maze-solver project.
 
-  by Nate Solis
+  by Nathan Solis
 
   Licensed with MIT License
   Please do not use this code in an opposing Destination Imagination situation. :) This is a simple request. If you are Dr. Doofenshmirtz, I cannot do anything about it.
   Copyright (c) 2022 Nate Solis
 */
-
+#include "Arduino.h"
 #include "SparkFun_TB6612.h"
 #include "DHT.h"
 #include "NewPing.h"
@@ -59,7 +59,7 @@ float distanceW;
 float soundspeedms; //
 float soundspeedcm; //
 
-const int iterations = 5; // amount of times we poke our ultrsonic sensors. 
+const int iterations = 5; // amount of times we poke our ultrsonic sensors.
 
 const float turnBuffer = 1.5;
 
@@ -68,7 +68,6 @@ int whileiter = 0;
 // motor driver offsets
 const int offsetA = 1;
 const int offsetB = 1;
-
 
 // constant speeds
 const int turning_speed = 155;
@@ -106,7 +105,6 @@ Motor motor2 = Motor(BIN1, BIN2, PWMB, offsetB, STBY);
 
 // Newping Library Object Declarations
 
-
 NewPing sonarN(trigPinNorth, echoPinNorth, MAX_DISTANCE);
 NewPing sonarE(trigPinEast, echoPinEast, MAX_DISTANCE);
 NewPing sonarW(trigPinWest, echoPinWest, MAX_DISTANCE);
@@ -119,9 +117,6 @@ unsigned long pingTimer;
 
 unsigned long prevTimedrive = 0;
 unsigned long timeDelaydrive = 4;
-
-
-
 
 DHT dht(DHTPIN, DHTYPE);
 // Function that runs actions necesary to dynamically generate a threshold for maze hallway reconsideration.
@@ -138,7 +133,6 @@ void dynathresh()
   WDynaThreshLow = round(distanceW - 4);
   WDynaThreshHigh = round(distanceW + 4);
 }
-
 
 void turn(bool initialize, bool is_left = false)
 {
@@ -166,28 +160,28 @@ void turn(bool initialize, bool is_left = false)
   {
     find_N();
     Serial.println("while loop iteration:");
-    whileiter = whileiter+1;
+    whileiter = whileiter + 1;
     Serial.print(whileiter);
     Serial.println("N | DEST");
-    Serial.println(distanceN);        
-    Serial.print(turning_dest);        
+    Serial.println(distanceN);
+    Serial.print(turning_dest);
     // if the codeblock above fails, try moving it out of the while loop, especiallyif the functions go with delays.
-    
+
     if (is_left == true)
     {
       inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turningL = false : is_turningL = true;
       if (is_turningL == true)
       {
         if (is_left == true)
-          {
-            left(motor1, motor2, turning_speed);
-            Serial.println("Turning left...");
-          }
+        {
+          left(motor1, motor2, turning_speed);
+          Serial.println("Turning left...");
+        }
         if (is_left == false)
-          {
-            right(motor1, motor2, turning_speed);
-            Serial.println("Turning right...");
-          }
+        {
+          right(motor1, motor2, turning_speed);
+          Serial.println("Turning right...");
+        }
       }
       if (is_turningL == false)
       {
@@ -205,15 +199,15 @@ void turn(bool initialize, bool is_left = false)
       if (is_turningR == true)
       {
         if (is_left == true)
-          {
-            left(motor1, motor2, turning_speed);
-            Serial.println("Turning left...");
-          }
+        {
+          left(motor1, motor2, turning_speed);
+          Serial.println("Turning left...");
+        }
         if (is_left == false)
-          {
-            right(motor1, motor2, turning_speed);
-            Serial.println("Turning right...");
-          }
+        {
+          right(motor1, motor2, turning_speed);
+          Serial.println("Turning right...");
+        }
       }
       if (is_turningR == false)
       {
@@ -223,14 +217,12 @@ void turn(bool initialize, bool is_left = false)
         break;
       }
     }
-
   }
   // those two statements let us know the direction we are turning in a unified function. The reason we have an extra function is so we can implement our own algorithms for 90 degree turning.
 }
 
 int sos()
 {
-  
 
   soundspeedms = 331.4 + (0.606 * temp) + (0.0124 * hum);
 
@@ -238,14 +230,12 @@ int sos()
   return soundspeedcm;
 }
 
-
-
 void find_prox()
 {
   /*
   Runs the proximity checks
   we can call this function at anytime to improve the accuracy of our time sitatuion.
-  */  
+  */
   sos();
 
   durationN = sonarN.ping_median(iterations);
@@ -276,14 +266,9 @@ void find_N()
   */
   sos();
 
-
   durationN = sonarN.ping_median(iterations);
 
-
   distanceN = (durationN / 2) * soundspeedcm;
-
-
-
 }
 
 void anti_drive()
@@ -308,12 +293,11 @@ void anti_drive()
       Nsafe = true;
     }
   }
-
 }
 
 void analyze_surroundings()
 {
-  
+
   if (distanceN >= 400 || distanceN <= 7)
   { // || is like or in python
     Nsafe = false;
@@ -362,7 +346,6 @@ void log_data()
   Serial.print(" cm WEST | ");
 }
 
-
 void driving_decision()
 {
   if (just_turned == true)
@@ -387,15 +370,14 @@ void driving_decision()
     {
       // turn left
       brake(motor1, motor2);
-      
-      turn(true, true);
 
+      turn(true, true);
     }
     if (Wsafe == false && Esafe == true && Nsafe == false)
     {
       // turn right
       brake(motor1, motor2);
-      
+
       turn(true, false);
     }
 
@@ -411,7 +393,6 @@ void driving_decision()
         forward(motor1, motor2, 200);
         delay(5000);
       }
-
     }
   }
   if (Nsafe == true && Wsafe == false && Esafe == false)
@@ -437,37 +418,44 @@ void driving_decision()
       delay(4000);
     }
     maybe_I_move();
-
   }
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   dht.begin();
   pingTimer = millis();
   pinMode(buttonPin, INPUT);
   buttonState = digitalRead(buttonPin);
   Serial.print("Hold button for access to non maze mode...");
-  Serial.print("Delay in Setup"); 
+  Serial.print("Delay in Setup");
   delay(2000);
-  if (buttonState == HIGH) {
+  if (buttonState == HIGH)
+  {
     Serial.print("GOING BERSERK");
-    berserk_mode = true;        
-  } else {
+    berserk_mode = true;
+  }
+  else
+  {
     find_prox();
-    dynathresh(); 
+    dynathresh();
   }
   hum = dht.readHumidity();
   temp = dht.readTemperature();
 }
 
-//last-ditch effort when undergoing a stalemate in terms of completing the maze.
-void maybe_I_move() {
-  if (distanceN <= 15){
-    if (distanceE > distanceW+3){ // turn east
+// last-ditch effort when undergoing a stalemate in terms of completing the maze.
+void maybe_I_move()
+{
+  if (distanceN <= 15)
+  {
+    if (distanceE > distanceW + 3)
+    { // turn east
       turn(false, true);
     }
-    if (distanceE < distanceW+3) { // turn west
+    if (distanceE < distanceW + 3)
+    { // turn west
       turn(true, true);
     }
   } // generaly confirming if we see a dead end
@@ -476,11 +464,12 @@ void maybe_I_move() {
 void loop()
 {
   // unsigned long timeCurrent = millis();
-// gather proximities
+  // gather proximities
   unsigned long timeCurrent = millis();
   // unsigned long timeCurrent = millis();
-// gather proximities
-  if (timeCurrent - prevTimeprox>timeDelayprox) {
+  // gather proximities
+  if (timeCurrent - prevTimeprox > timeDelayprox)
+  {
     prevTimeprox += timeDelayprox;
     find_prox();
   }
@@ -488,6 +477,5 @@ void loop()
   analyze_surroundings();
   driving_decision();
   log_data();
-
-} 
+}
 // shut up no test
