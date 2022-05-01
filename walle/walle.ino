@@ -272,7 +272,7 @@ void find_prox()
 void find_N()
 {
   /*
- only gathers northern one
+  only gathers northern one
   */
   sos();
 
@@ -489,4 +489,5 @@ void loop()
   driving_decision();
   log_data();
 
-}
+} 
+// shut up no test
