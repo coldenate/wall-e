@@ -1,4 +1,5 @@
 {
-    "sketch": "walle\\walle.ino",
-    "board": "arduino:avr:uno"
+  "sketch": "walle\\walle.ino",
+  "board": "arduino:avr:uno",
+  "output": "../build"
 }

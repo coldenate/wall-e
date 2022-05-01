@@ -22,7 +22,8 @@
                 "${workspaceFolder}/**",
                 "C:/Users/${env:USERNAME}/OneDrive/Documents/Arduino/libraries/**",
                 "C:/Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino",
-                "C:/Program Files (x86)/Arduino/hardware/arduino/**"
+                "C:/Program Files (x86)/Arduino/hardware/arduino/**",
+                "C:/Users/${env:USERNAME}/OneDrive/Computer Science Projects/Arduino Projects"
 
                 
             ],
@@ -37,6 +38,7 @@
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"
+            
         }
     ],
     "version": 4
