@@ -16,23 +16,23 @@
 #include "DHT.h"
 #include "NewPing.h"
 // motor driver pins
-#define AIN1 7
-#define BIN1 11
-#define AIN2 8
-#define BIN2 12
 #define PWMA 9
-#define PWMB 10
+#define AIN2 8
+#define AIN1 7
 #define STBY 13
+#define BIN1 11
+#define BIN2 12
+#define PWMB 10
 
 // Temperature Sensor Pin and Type
 
-#define DHTPIN 2
+#define DHTPIN A5
 #define DHTYPE DHT11
 
 // Define Ultrasonic Sensor Pins
 
 // West
-#define trigPinWest 3
+#define trigPinWest 3 //green and blue
 #define echoPinWest 3 // they are the same because the script supports a dual-channel type flow for sending and receiving pulses.
 // East
 #define trigPinEast 5
