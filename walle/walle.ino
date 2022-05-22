@@ -9,7 +9,7 @@
 
   Licensed with MIT License
   Please do not use this code in an opposing Destination Imagination situation. :) This is a simple request. If you are Dr. Doofenshmirtz, I cannot do anything about it.
-  Copyright (c) 2022 Nate Solis
+  Copyright (c) 2022 Nathan Solis and the BBASH HCA Team
 */
 #include "Arduino.h"
 #include "SparkFun_TB6612.h"
