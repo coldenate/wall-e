@@ -32,13 +32,13 @@
 
 // Temperature Sensor Pin and Type
 
-#define DHTPIN A5
+#define DHTPIN 2
 #define DHTYPE DHT11
 
 // Define Ultrasonic Sensor Pins
 
 // West
-#define trigPinWest 3 //green and blue
+#define trigPinWest 3 // green and blue
 #define echoPinWest 3 // they are the same because the script supports a dual-channel type flow for sending and receiving pulses.
 // East
 #define trigPinEast 5
@@ -52,10 +52,11 @@
 
 #define buttonPin 4
 
-int buttonState = 0; // a value for the default (OFF) button state | this represents the button NOT completing a circuit flow.
-
 #define MAX_DISTANCE 400 // I AM ON MAXIMUM RENDER DISTANCE, AND I STILL CAN'T FIND WHO ASKED (Max distance to care about in the world of ultrasonic sound)
 
+int buttonState = 0; // a value for the default (OFF) button state | this represents the button NOT completing a circuit flow.
+
+float previous_vector;
 float durationN;
 float durationE;
 float durationW;
@@ -66,19 +67,19 @@ float distanceE;
 float distanceW;
 float soundspeedms; //
 float soundspeedcm; //
-
+// adjustments
 const int iterations = 5; // amount of times we poke our ultrsonic sensors.
 
-const float turnBuffer = 1.5;
+const float turnBuffer = 0.15;
+
+// constant speeds
+const int turning_speed = 165;
 
 int whileiter = 0;
 
 // motor driver offsets
 const int offsetA = 1;
 const int offsetB = 1;
-
-// constant speeds
-const int turning_speed = 155;
 
 // default dynamic threshold generations if the threshold generation doesn'texecute
 
@@ -101,6 +102,7 @@ bool is_turningL = false;
 bool is_turningR = false;
 float turning_dest;
 bool ignore_north = false;
+
 bool inRange(unsigned low, unsigned high, unsigned x)
 {
   return (low <= x && x <= high);
@@ -142,8 +144,22 @@ void dynathresh()
   WDynaThreshHigh = round(distanceW + 4);
 }
 
+void detect_stray_vector(float prev_vector, float new_vector, bool is_left)
+{
+  if (new_vector - prev_vector < 101 && new_vector - prev_vector > 1)
+  {
+    if (is_left == true)
+      is_turningL = true;
+  }
+  if (is_left == false)
+  {
+    is_turningR = true;
+  }
+}
+
 void turn(bool initialize, bool is_left = false)
 {
+  previous_vector = distanceN; // THIS IS BEFORE WE RUN ANOTHER PING. WE ARE TRYING TO SOLVE THE VECTOR REFLECTION ISSUE.
   if (is_left == true)
   {
     is_turningL = true;
@@ -166,18 +182,21 @@ void turn(bool initialize, bool is_left = false)
   whileiter = 0;
   while (true)
   {
+
     find_N();
     Serial.println("while loop iteration:");
     whileiter = whileiter + 1;
     Serial.print(whileiter);
     Serial.println("N | DEST");
-    Serial.println(distanceN);
+    Serial.print(distanceN);
+    Serial.print("||");
     Serial.print(turning_dest);
     // if the codeblock above fails, try moving it out of the while loop, especiallyif the functions go with delays.
 
     if (is_left == true)
     {
       inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turningL = false : is_turningL = true;
+      detect_stray_vector(previous_vector, distanceN, true);
       if (is_turningL == true)
       {
         if (is_left == true)
@@ -204,6 +223,7 @@ void turn(bool initialize, bool is_left = false)
     if (is_left == false)
     {
       inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turningR = false : is_turningR = true;
+      detect_stray_vector(previous_vector, distanceN, false);
       if (is_turningR == true)
       {
         if (is_left == true)
@@ -458,11 +478,11 @@ void maybe_I_move()
 {
   if (distanceN <= 15)
   {
-    if (distanceE > distanceW + 3)
+    if (distanceE > distanceW + 3 || distanceE == 0)
     { // turn east
       turn(false, true);
     }
-    if (distanceE < distanceW + 3)
+    if (distanceE < distanceW + 3 || distanceW == 0)
     { // turn west
       turn(true, true);
     }
