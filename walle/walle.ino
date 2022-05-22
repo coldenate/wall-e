@@ -11,6 +11,12 @@
   Please do not use this code in an opposing Destination Imagination situation. :) This is a simple request. If you are Dr. Doofenshmirtz, I cannot do anything about it.
   Copyright (c) 2022 Nathan Solis and the BBASH HCA Team
 */
+
+/* TODO: Implement
+- Right-Hand Rule algorithm
+- Clean Up turning ai
+- read some articles for inspiration or something
+*/
 #include "Arduino.h"
 #include "SparkFun_TB6612.h"
 #include "DHT.h"
