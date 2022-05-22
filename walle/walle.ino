@@ -67,6 +67,7 @@ float distanceE;
 float distanceW;
 float soundspeedms; //
 float soundspeedcm; //
+float difference;
 // adjustments
 const int iterations = 5; // amount of times we poke our ultrsonic sensors.
 
@@ -144,22 +145,22 @@ void dynathresh()
   WDynaThreshHigh = round(distanceW + 4);
 }
 
-void detect_stray_vector(float prev_vector, float new_vector, bool is_left)
-{
-  if (new_vector - prev_vector < 101 && new_vector - prev_vector > 1)
-  {
-    if (is_left == true)
-      is_turningL = true;
-  }
-  if (is_left == false)
-  {
-    is_turningR = true;
-  }
-}
+// void detect_stray_vector(float prev_vector, float new_vector, bool is_left)
+// {
+//   if (new_vector - prev_vector < 101 && new_vector - prev_vector > 1)
+//   {
+//     if (is_left == true)
+//       is_turningL = true;
+//   }
+//   if (is_left == false)
+//   {
+//     is_turningR = true;
+//   }
+// }
 
 void turn(bool initialize, bool is_left = false)
 {
-  previous_vector = distanceN; // THIS IS BEFORE WE RUN ANOTHER PING. WE ARE TRYING TO SOLVE THE VECTOR REFLECTION ISSUE.
+  // previous_vector = distanceN; // THIS IS BEFORE WE RUN ANOTHER PING. WE ARE TRYING TO SOLVE THE VECTOR REFLECTION ISSUE.
   if (is_left == true)
   {
     is_turningL = true;
@@ -196,7 +197,7 @@ void turn(bool initialize, bool is_left = false)
     if (is_left == true)
     {
       inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turningL = false : is_turningL = true;
-      detect_stray_vector(previous_vector, distanceN, true);
+      // detect_stray_vector(previous_vector, distanceN, true);
       if (is_turningL == true)
       {
         if (is_left == true)
@@ -223,7 +224,7 @@ void turn(bool initialize, bool is_left = false)
     if (is_left == false)
     {
       inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turningR = false : is_turningR = true;
-      detect_stray_vector(previous_vector, distanceN, false);
+      // detect_stray_vector(previous_vector, distanceN, false);
       if (is_turningR == true)
       {
         if (is_left == true)
@@ -265,6 +266,7 @@ void find_prox()
   we can call this function at anytime to improve the accuracy of our time sitatuion.
   */
   sos();
+  previous_vector = distanceN; // previous_vector
 
   durationN = sonarN.ping_median(iterations);
   durationE = sonarE.ping_median(iterations);
@@ -287,6 +289,16 @@ void find_prox()
   distanceW = (durationW / 2) * soundspeedcm;
   // end of gatehring distance
 }
+
+void detect_stray_vector(float prev_vector, float new_vector)
+{
+  difference = new_vector - prev_vector;
+  if (difference < 105 && difference > 10)
+  {
+    distanceN = prev_vector;
+  }
+}
+
 void find_N()
 {
   /*
@@ -297,6 +309,7 @@ void find_N()
   durationN = sonarN.ping_median(iterations);
 
   distanceN = (durationN / 2) * soundspeedcm;
+  detect_stray_vector(previous_vector, distanceN);
 }
 
 void anti_drive()
