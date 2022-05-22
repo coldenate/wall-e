@@ -46,35 +46,47 @@
 // North (Prioritized driving direction)
 // North is also in context of the robot, not the actual magnetic fields of earth. Although the script may include a magnetometer.
 
+#define trigPinSouth 4
+#define echoPinSouth 4
+
 #define trigPinNorth 6
 #define echoPinNorth 6
 // Button for actiting debug mode
 
-#define buttonPin 4
+#define buttonPin A5
 
 #define MAX_DISTANCE 400 // I AM ON MAXIMUM RENDER DISTANCE, AND I STILL CAN'T FIND WHO ASKED (Max distance to care about in the world of ultrasonic sound)
 
 int buttonState = 0; // a value for the default (OFF) button state | this represents the button NOT completing a circuit flow.
-
+unsigned long timeCurrentvec = 0;
 float previous_vector;
 float durationN;
 float durationE;
 float durationW;
+float distances;
+float durationS;
 float hum;  // humidity
 float temp; // temperature (both derviedfrom our trmp sensoirkrfgksdjf)
 float distanceN;
+float distanceNtemp;
 float distanceE;
 float distanceW;
+float distanceS;
 float soundspeedms; //
 float soundspeedcm; //
 float difference;
+float is_turning1 = false;
+float is_turning2 = false;
+float is_turning11 = false;
+float is_turning22 = false;
+int count = 0;
 // adjustments
-const int iterations = 5; // amount of times we poke our ultrsonic sensors.
+const int iterations = 6; // amount of times we poke our ultrsonic sensors.
 
 const float turnBuffer = 0.15;
 
 // constant speeds
-const int turning_speed = 165;
+const int turning_speed = 175;
 
 int whileiter = 0;
 
@@ -93,15 +105,16 @@ int WDynaThreshHigh = 14;
 bool berserk_mode = false;
 bool debug_mode = true; // effects serial output
 bool stdf = true;       // until proven otherwise
-
+bool corrected = 0;
 bool Nsafe = false;
 bool Esafe;
 bool Wsafe;
+bool Ssafe;
 bool just_turned = false;
 bool driving = false;
-bool is_turningL = false;
-bool is_turningR = false;
+
 float turning_dest;
+float turning_destS;
 bool ignore_north = false;
 
 bool inRange(unsigned low, unsigned high, unsigned x)
@@ -117,11 +130,15 @@ Motor motor2 = Motor(BIN1, BIN2, PWMB, offsetB, STBY);
 // Newping Library Object Declarations
 
 NewPing sonarN(trigPinNorth, echoPinNorth, MAX_DISTANCE);
+NewPing sonarS(trigPinSouth, echoPinSouth, MAX_DISTANCE);
 NewPing sonarE(trigPinEast, echoPinEast, MAX_DISTANCE);
 NewPing sonarW(trigPinWest, echoPinWest, MAX_DISTANCE);
 
 unsigned long prevTimeprox = 0;
 unsigned long timeDelayprox = 2;
+
+unsigned long prevTimevec = 0;
+unsigned long timeDelayvec = 2;
 
 unsigned int pingSpeed = 35; // 20 times as second
 unsigned long pingTimer;
@@ -150,11 +167,11 @@ void dynathresh()
 //   if (new_vector - prev_vector < 101 && new_vector - prev_vector > 1)
 //   {
 //     if (is_left == true)
-//       is_turningL = true;
+//       is_turning1 = true;
 //   }
 //   if (is_left == false)
 //   {
-//     is_turningR = true;
+//     is_turning22 = true;
 //   }
 // }
 
@@ -163,21 +180,23 @@ void turn(bool initialize, bool is_left = false)
   // previous_vector = distanceN; // THIS IS BEFORE WE RUN ANOTHER PING. WE ARE TRYING TO SOLVE THE VECTOR REFLECTION ISSUE.
   if (is_left == true)
   {
-    is_turningL = true;
+    is_turning1 = true;
   }
   if (is_left == false)
   { // "if we are turning right"
-    is_turningR = true;
+    is_turning22 = true;
   }
   if (initialize == true)
   {
     if (is_left == true)
     {
       turning_dest = distanceW;
+      turning_destS = distanceE;
     }
     if (is_left == false)
     {
       turning_dest = distanceE;
+      turning_destS = distanceW;
     }
   }
   whileiter = 0;
@@ -196,9 +215,10 @@ void turn(bool initialize, bool is_left = false)
 
     if (is_left == true)
     {
-      inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turningL = false : is_turningL = true;
+      inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turning1 = false : is_turning1 = true;
+      inRange(turning_destS - turnBuffer, turning_destS + turnBuffer, distanceS) ? is_turning2 = false : is_turning2 = true;
       // detect_stray_vector(previous_vector, distanceN, true);
-      if (is_turningL == true)
+      if (is_turning1 == true && is_turning2 == true)
       {
         if (is_left == true)
         {
@@ -211,21 +231,22 @@ void turn(bool initialize, bool is_left = false)
           Serial.println("Turning right...");
         }
       }
-      if (is_turningL == false)
+      if (is_turning1 == false)
       {
         brake(motor1, motor2);
         Serial.println("Done turning");
-        delay(2000); // DO NOT INCLUDE IN PRODUCTION
+        // delay(2000); // DO NOT INCLUDE IN PRODUCTION
         just_turned = true;
-        // is_turningL=false;
+        // is_turning1=false;
         break;
       }
     }
     if (is_left == false)
     {
-      inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turningR = false : is_turningR = true;
+      inRange(turning_destS - turnBuffer, turning_destS + turnBuffer, distanceS) ? is_turning11 = false : is_turning11 = true;
+      inRange(turning_dest - turnBuffer, turning_dest + turnBuffer, distanceN) ? is_turning22 = false : is_turning22 = true;
       // detect_stray_vector(previous_vector, distanceN, false);
-      if (is_turningR == true)
+      if (is_turning22 == true && is_turning11 == true)
       {
         if (is_left == true)
         {
@@ -238,11 +259,11 @@ void turn(bool initialize, bool is_left = false)
           Serial.println("Turning right...");
         }
       }
-      if (is_turningR == false)
+      if (is_turning22 == false)
       {
         brake(motor1, motor2);
         just_turned = true;
-        // is_turningR=false;
+        // is_turning22=false;
         break;
       }
     }
@@ -266,7 +287,6 @@ void find_prox()
   we can call this function at anytime to improve the accuracy of our time sitatuion.
   */
   sos();
-  previous_vector = distanceN; // previous_vector
 
   durationN = sonarN.ping_median(iterations);
   durationE = sonarE.ping_median(iterations);
@@ -290,26 +310,41 @@ void find_prox()
   // end of gatehring distance
 }
 
-void detect_stray_vector(float prev_vector, float new_vector)
-{
-  difference = new_vector - prev_vector;
-  if (difference < 105 && difference > 10)
-  {
-    distanceN = prev_vector;
-  }
-}
+// void detect_stray_vector(float prev_vector, float new_vector)
+// {
+
+//   prevTimevec += timeDelayvec;
+//   if (corrected == 2)
+//   {
+//     corrected = 0;
+//     distanceN = new_vector;
+//   }
+//   if (new_vector - prev_vector < 110 && new_vector - prev_vector > 30 && corrected != 2)
+//   {
+//     corrected += 1;
+//     Serial.println("DetectedStrayVector as ");
+//     Serial.print(new_vector);
+//     distanceN = prev_vector;
+//     Serial.println("\n\nASSERTED DISTANCEn TO ");
+//     Serial.print(distanceN);
+//   }
+// }
 
 void find_N()
 {
+  // unsigned long timeCurrent = millis();
   /*
   only gathers northern one
   */
   sos();
 
   durationN = sonarN.ping_median(iterations);
+  durationS = sonarS.ping_median(iterations);
 
   distanceN = (durationN / 2) * soundspeedcm;
-  detect_stray_vector(previous_vector, distanceN);
+  distanceS = (durationS / 2) * soundspeedcm;
+
+  // detect_stray_vector(distanceN, distances);
 }
 
 void anti_drive()
