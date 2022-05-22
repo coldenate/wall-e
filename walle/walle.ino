@@ -81,7 +81,7 @@ float is_turning11 = false;
 float is_turning22 = false;
 int count = 0;
 // adjustments
-const int iterations = 6; // amount of times we poke our ultrsonic sensors.
+const int iterations = 4; // amount of times we poke our ultrsonic sensors.
 
 const float turnBuffer = 0.15;
 
@@ -343,6 +343,9 @@ void find_N()
 
   distanceN = (durationN / 2) * soundspeedcm;
   distanceS = (durationS / 2) * soundspeedcm;
+  Serial.print(distanceS);
+  Serial.print("<--- Southern Distance");
+  Serial.println(" ");
 
   // detect_stray_vector(distanceN, distances);
 }
