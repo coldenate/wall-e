@@ -1,0 +1,7 @@
+{
+    "C_Cpp.intelliSenseEngineFallback":"Disabled",
+    "C_Cpp.intelliSenseEngine": "Tag Parser",
+    "arduino.additionalUrls": [
+        "https://github.com/sparkfun/SparkFun_TB6112FNG_Arduino_Library"
+    ]
+}

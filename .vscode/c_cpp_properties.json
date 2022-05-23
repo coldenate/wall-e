@@ -1,0 +1,45 @@
+{
+    "configurations": [
+        // {
+        //     "name": "Win32",
+        //     "includePath": [
+        //         "${workspaceFolder}/**"
+        //     ],
+        //     "defines": [
+        //         "_DEBUG",
+        //         "UNICODE",
+        //         "_UNICODE"
+        //     ],
+        //     "windowsSdkVersion": "10.0.18362.0",
+        //     "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Tools/MSVC/14.28.29333/bin/Hostx64/x64/cl.exe",
+        //     "cStandard": "c17",
+        //     "cppStandard": "c++17",
+        //     "intelliSenseMode": "windows-msvc-x64"
+        // },
+        {
+            "name": "ArduinoAVR",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/Users/${env:USERNAME}/OneDrive/Documents/Arduino/libraries/**",
+                "C:/Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino",
+                "C:/Program Files (x86)/Arduino/hardware/arduino/**",
+                "C:/Users/${env:USERNAME}/OneDrive/Computer Science Projects/Arduino Projects"
+
+                
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "USBCON"
+            ],
+            "windowsSdkVersion": "10.0.18362.0",
+            "compilerPath": "C:/Users/${env:USERNAME}/AppData/Local/Arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+            
+        }
+    ],
+    "version": 4
+}
