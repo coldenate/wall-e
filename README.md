@@ -2,16 +2,9 @@
 # Ninety-Degree Maze-Solving Robot
 
 This repository holds the code for a 90° maze-solving robot car. Named after Wall•E because ultrasonic sensors look like the eyes of Wall•E!
+This was a beginner's robotics project I did once. I reset the repository because of some insecurities, but I'm going to keep it up for posterity.
 
-# README TODO
-
-- [x] Rudimentary Explanation
-- [x] Layout
-- [x] Add diagram for logic
-- [ ] Add diagram for wiring
-- [ ] Grammar check
-- [ ] Add cad files and other sources
-- [ ] Make repo public
+**Note:** The code was last touched on May 22, 2022. I'm not sure if it works anymore, but it should. ¯\_(ツ)_/¯
 
 ## Purpose
 
@@ -25,21 +18,6 @@ See the [‘flowchart‘](flowchart.md)
 ## Why?
 
 For a [Destination Imagination Challenge](https://www.destinationimagination.org) :). It also incorporates sound science and mathematics for the execution of movement functions.
-
-### Faq
-
-Are you aware your code is rudimentary?
-
-> Yes, I barely have an idea of how to use a keyboard.
-> Jokes aside, I am still a beginner in C++, and I am scared of classes.
-
-What chip is the hardest to come by?
-
-> I would watch out for Motor Drivers. They are sneaky fellows.
-
-How do I wire the robot up?
-
-> I forgot to post that. I will do that soon.
 
 # Legal Jargon
 
